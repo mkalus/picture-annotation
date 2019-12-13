@@ -4,6 +4,7 @@
       <a href="#" @click.prevent="addPolygon"><icon type="add-polygon" /></a>
       <a href="#" @click.prevent="addRectangle"><icon type="add-rectangle" /></a>
       <a href="#" @click.prevent="addCircle"><icon type="add-circle" /></a>
+      <a href="#" @click.prevent="addPerson"><icon type="add-person" /></a>
       <a href="#" @click.prevent="deleteShape(selectedShapeName)"><icon type="delete-shape" :fill="selectedShapeName ? 'red' : 'gray'" /></a>
     </div>
 
@@ -24,6 +25,7 @@
           <v-rect v-if="shape.type === 'rect'" :config="shape" :key="shape.name" />
           <v-circle v-if="shape.type === 'circle'" :config="shape" :key="shape.name" />
           <v-line v-if="shape.type === 'poly'" :config="shape" :key="shape.name" />
+          <v-path v-if="shape.type === 'path'" :config="shape" :key="shape.name" />
         </template>
         <v-transformer ref="transformer"/>
       </v-layer>
@@ -136,6 +138,19 @@ export default {
         x: 150,
         y: 150,
         radius: 100
+      });
+    },
+
+    addPerson () {
+      this.shapes.push({
+        ...this.getBaseShape('path'),
+        x: 250,
+        y: 250,
+        data: 'm 105.61519,0 a 52.807596,52.807596 0 1 1 0,105.61519 52.807596,52.807596 0 0 1 0,-105.61519 m 0,105.61519 c 58.3524,0 105.61522,23.63141 105.61522,52.8076 V 264.038 H 0 V 158.42279 c 0,-29.17619 47.262803,-52.8076 105.61519,-52.8076 z',
+        scale: {
+          x: 2,
+          y: 2
+        }
       });
     },
 
