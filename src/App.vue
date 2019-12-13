@@ -23,6 +23,7 @@
         <template v-for="shape in shapes">
           <v-rect v-if="shape.type === 'rect'" :config="shape" :key="shape.name" />
           <v-circle v-if="shape.type === 'circle'" :config="shape" :key="shape.name" />
+          <v-line v-if="shape.type === 'poly'" :config="shape" :key="shape.name" />
         </template>
         <v-transformer ref="transformer"/>
       </v-layer>
@@ -42,7 +43,7 @@ export default {
   },
   data () {
     return {
-      containerId: 'xxyyzz', // dummy, set later TODO
+      containerId: 'basic-test-container', // dummy, set later TODO
       image: null,
       stageSize: {
         width: width,
@@ -114,8 +115,11 @@ export default {
 
     // handle additions
     addPolygon () {
-      console.log('addPolygon');
-      // TODO
+      this.shapes.push({
+        ...this.getBaseShape('poly'),
+        points: [23, 20, 23, 160, 70, 93, 150, 109, 290, 139, 270, 93], // TODO: addPoly Layer + Function
+        closed: true
+      });
     },
     addRectangle () {
       this.shapes.push({
