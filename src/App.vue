@@ -5,6 +5,7 @@
       <a href="#" @click.prevent="addRectangle"><icon type="add-rectangle" /></a>
       <a href="#" @click.prevent="addCircle"><icon type="add-circle" /></a>
       <a href="#" @click.prevent="addPerson"><icon type="add-person" /></a>
+      <a href="#" @click.prevent="openAnnotation(selectedShapeName)"><icon type="edit-shape" :fill="selectedShapeName ? 'green' : 'gray'" /></a>
       <a href="#" @click.prevent="deleteShape(selectedShapeName)"><icon type="delete-shape" :fill="selectedShapeName ? 'red' : 'gray'" /></a>
     </div>
 
@@ -22,10 +23,10 @@
       </v-layer>
       <v-layer ref="items">
         <template v-for="shape in shapes">
-          <v-rect v-if="shape.type === 'rect'" :config="shape" :key="shape.name" />
-          <v-circle v-if="shape.type === 'circle'" :config="shape" :key="shape.name" />
-          <v-line v-if="shape.type === 'poly'" :config="shape" :key="shape.name" />
-          <v-path v-if="shape.type === 'path'" :config="shape" :key="shape.name" />
+          <v-rect v-if="shape.type === 'rect'" :config="shape" :key="shape.name" @dblclick="openAnnotation($event, shape.name)" @contextmenu="openContextMenu($event, shape.name)" />
+          <v-circle v-if="shape.type === 'circle'" :config="shape" :key="shape.name" @dblclick="openAnnotation($event, shape.name)" @contextmenu="openContextMenu($event, shape.name)" />
+          <v-line v-if="shape.type === 'poly'" :config="shape" :key="shape.name" @dblclick="openAnnotation($event, shape.name)" @contextmenu="openContextMenu($event, shape.name)" />
+          <v-path v-if="shape.type === 'path'" :config="shape" :key="shape.name" @dblclick="openAnnotation($event, shape.name)" @contextmenu="openContextMenu($event, shape.name)" />
         </template>
         <v-transformer ref="transformer"/>
       </v-layer>
@@ -200,6 +201,18 @@ export default {
       if (scale > 5) scale = 5;
 
       this.scale = scale;
+    },
+
+    // annotation handling
+    openAnnotation (event, name) {
+      if (event.evt) event.evt.preventDefault();
+      alert('Annotate!'); // TODO
+    },
+
+    // open context menu handling
+    openContextMenu (event, name) {
+      if (event.evt) event.evt.preventDefault();
+      alert('ContextMenu!'); // TODO
     }
   }
 };
