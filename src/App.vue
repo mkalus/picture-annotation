@@ -1,10 +1,14 @@
 <template>
   <div :id="containerId" class="pa-container">
     <div class="pa-controls">
+      <a href="#" @click.prevent="changeScale(0.1)"><icon type="zoom-in" /></a>
+      <a href="#" @click.prevent="changeScale(-0.1)"><icon type="zoom-out" /></a>
+      <hr />
       <a href="#" @click.prevent="addPolygon"><icon type="add-polygon" /></a>
       <a href="#" @click.prevent="addRectangle"><icon type="add-rectangle" /></a>
       <a href="#" @click.prevent="addCircle"><icon type="add-circle" /></a>
       <a href="#" @click.prevent="addPerson"><icon type="add-person" /></a>
+      <hr />
       <a href="#" @click.prevent="openAnnotation(selectedShapeName)"><icon type="edit-shape" :fill="selectedShapeName ? 'green' : 'gray'" /></a>
       <a href="#" @click.prevent="deleteShape(selectedShapeName)"><icon type="delete-shape" :fill="selectedShapeName ? 'red' : 'gray'" /></a>
     </div>
@@ -59,12 +63,21 @@ export default {
   },
   // created live cycle hook
   created () {
+    // load image
     const image = new window.Image();
     image.src = './example/example.jpg';
     image.onload = () => {
       // set image only when it is loaded
       this.image = image;
+      // adapt initial scale to fit canvas
+      this.changeScale(-Math.max(width / image.width, height / image.height));
     };
+  },
+  mounted () {
+    document.addEventListener('keydown', this.handleKeyEvent);
+  },
+  beforeDestroy () {
+    document.removeEventListener('keydown', this.handleKeyEvent);
   },
   methods: {
     // handle transformation of elements
@@ -181,6 +194,15 @@ export default {
       }
     },
 
+    // handle key events
+    handleKeyEvent (event) {
+      // shape selected?
+      if (this.selectedShapeName) {
+        // delete key pressed?
+        if (event.key === 'Delete') this.deleteShape(this.selectedShapeName);
+      }
+    },
+
     // handle scaling of canvas
     handleScroll (e) {
       if (e.evt) {
@@ -200,6 +222,7 @@ export default {
       if (scale < 0.1) scale = 0.1;
       if (scale > 5) scale = 5;
 
+      // TODO: easing or timer - https://konvajs.org/docs/tweens/Common_Easings.html
       this.scale = scale;
     },
 
@@ -236,4 +259,9 @@ export default {
     color: #000
     display: block
     padding: 0.2em
+
+  hr
+    color: #000
+    padding: 0
+    margin: 0.1em 0 0.3em 0
 </style>
