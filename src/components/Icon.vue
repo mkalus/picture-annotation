@@ -1,6 +1,6 @@
 <template>
   <span class="pa-icon">
-    <svg fill="currentColor"
+    <svg :fill="fill"
          :width="width"
          :height="height"
          :viewBox="viewBox"
@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import { mdiShapePolygonPlus, mdiShapeSquarePlus, mdiShapeCirclePlus } from '@mdi/js';
+import { mdiShapePolygonPlus, mdiShapeSquarePlus, mdiShapeCirclePlus, mdiDeleteOutline } from '@mdi/js';
 
 /**
  * Icon helper for SVG Icons
@@ -22,6 +22,10 @@ export default {
     type: {
       type: String,
       required: true
+    },
+    fill: {
+      type: String,
+      default: 'currentColor'
     },
     width: {
       type: [Number, String],
@@ -50,6 +54,7 @@ export default {
         case 'add-polygon': return mdiShapePolygonPlus;
         case 'add-rectangle': return mdiShapeSquarePlus;
         case 'add-circle': return mdiShapeCirclePlus;
+        case 'delete-shape': return mdiDeleteOutline;
         default: return 'NOT FOUND';
       }
     }

@@ -4,6 +4,7 @@
       <a href="#" @click.prevent="addPolygon"><icon type="add-polygon" /></a>
       <a href="#" @click.prevent="addRectangle"><icon type="add-rectangle" /></a>
       <a href="#" @click.prevent="addCircle"><icon type="add-circle" /></a>
+      <a href="#" @click.prevent="deleteShape(selectedShapeName)"><icon type="delete-shape" :fill="selectedShapeName ? 'red' : 'gray'" /></a>
     </div>
 
     <v-stage :config="{
@@ -19,9 +20,11 @@
           }" />
       </v-layer>
       <v-layer ref="items">
-        <v-rect v-for="item in rectangles" :key="item.id" :config="item" />
-        <v-circle :config="configCircle"></v-circle>
-        <v-transformer ref="transformer" />
+        <template v-for="shape in shapes">
+          <v-rect v-if="shape.type === 'rect'" :config="shape" :key="shape.name" />
+          <v-circle v-if="shape.type === 'circle'" :config="shape" :key="shape.name" />
+        </template>
+        <v-transformer ref="transformer"/>
       </v-layer>
     </v-stage>
   </div>
@@ -45,39 +48,9 @@ export default {
         width: width,
         height: height
       },
-      scale: 1,
-      configCircle: {
-        x: 100,
-        y: 100,
-        radius: 70,
-        fill: 'red',
-        stroke: 'black',
-        strokeWidth: 4,
-        draggable: true,
-        name: 'circle1'
-      },
-      rectangles: [
-        {
-          x: 10,
-          y: 10,
-          width: 100,
-          height: 100,
-          fill: 'blue',
-          opacity: 0.5,
-          name: 'rect1',
-          draggable: true
-        },
-        {
-          x: 150,
-          y: 150,
-          width: 100,
-          height: 100,
-          fill: 'green',
-          name: 'rect2',
-          draggable: true
-        }
-      ],
-      selectedShapeName: ''
+      scale: 1, // current scale
+      shapes: [], // shape container
+      selectedShapeName: '' // currently selected shape
     };
   },
   // created live cycle hook
@@ -106,18 +79,13 @@ export default {
         return;
       }
 
-      // find clicked rect by its name
+      // find clicked shape by its name
       const name = e.target.name();
-      const rect = this.rectangles.find(r => r.name === name);
-      if (rect) {
+      const shape = this.shapes.find(r => r.name === name);
+      if (shape) {
         this.selectedShapeName = name;
       } else {
         this.selectedShapeName = '';
-      }
-
-      // find circle
-      if (!this.selectedShapeName && name === this.configCircle.name) {
-        this.selectedShapeName = name;
       }
 
       this.updateTransformer();
@@ -150,21 +118,47 @@ export default {
       // TODO
     },
     addRectangle () {
-      // TODO
-      console.log('addRectangle');
-      this.rectangles.push({
+      this.shapes.push({
+        ...this.getBaseShape('rect'),
         x: 150,
         y: 150,
         width: 100,
-        height: 100,
-        fill: 'green',
-        name: 'rect3',
-        draggable: true
+        height: 100
       });
     },
     addCircle () {
-      // TODO
-      console.log('addCircle');
+      this.shapes.push({
+        ...this.getBaseShape('circle'),
+        x: 150,
+        y: 150,
+        radius: 100
+      });
+    },
+
+    getBaseShape (type) {
+      return {
+        type: type,
+        name: 'shape-' + (new Date()).valueOf(),
+        fill: 'lightsteelblue',
+        opacity: 0.5,
+        stroke: 'blue',
+        draggable: true,
+        strokeWidth: 2,
+        strokeScaleEnabled: false
+      };
+    },
+
+    // delete shape
+    deleteShape (name) {
+      const idx = this.shapes.findIndex(r => r.name === name);
+      if (idx >= 0) {
+        if (name === this.selectedShapeName) {
+          this.selectedShapeName = '';
+          this.updateTransformer();
+        }
+
+        this.shapes.splice(idx, 1);
+      }
     },
 
     // handle scaling of canvas
