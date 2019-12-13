@@ -1,5 +1,11 @@
 <template>
-  <div :id="containerId">
+  <div :id="containerId" class="pa-container">
+    <div class="pa-controls">
+      <a href="#" @click.prevent="addPolygon"><icon type="add-polygon" /></a>
+      <a href="#" @click.prevent="addRectangle"><icon type="add-rectangle" /></a>
+      <a href="#" @click.prevent="addCircle"><icon type="add-circle" /></a>
+    </div>
+
     <v-stage :config="{
       width: stageSize.width,
       height: stageSize.height,
@@ -7,12 +13,12 @@
       scaleY: scale,
       draggable: true
     }" @mousedown="handleStageMouseDown" @wheel="handleScroll">
-      <v-layer>
+      <v-layer ref="background">
         <v-image :config="{
             image: image
           }" />
       </v-layer>
-      <v-layer ref="layer">
+      <v-layer ref="items">
         <v-rect v-for="item in rectangles" :key="item.id" :config="item" />
         <v-circle :config="configCircle"></v-circle>
         <v-transformer ref="transformer" />
@@ -22,10 +28,15 @@
 </template>
 
 <script>
+import Icon from './components/Icon';
+
 const width = window.innerWidth;
 const height = window.innerHeight;
 
 export default {
+  components: {
+    Icon
+  },
   data () {
     return {
       containerId: 'xxyyzz', // dummy, set later TODO
@@ -51,7 +62,8 @@ export default {
           y: 10,
           width: 100,
           height: 100,
-          fill: 'red',
+          fill: 'blue',
+          opacity: 0.5,
           name: 'rect1',
           draggable: true
         },
@@ -77,14 +89,8 @@ export default {
       this.image = image;
     };
   },
-  // mounted live cycle hook
-  mounted () {
-    document.getElementById(this.containerId).addEventListener('wheel', this.handleScroll);
-  },
-  beforeDestroy () {
-    document.getElementById(this.containerId).removeEventListener('wheel', this.handleScroll);
-  },
   methods: {
+    // handle transformation of elements
     handleStageMouseDown (e) {
       // clicked on stage - clear selection
       if (e.target === e.target.getStage()) {
@@ -138,6 +144,29 @@ export default {
       transformerNode.getLayer().batchDraw();
     },
 
+    // handle additions
+    addPolygon () {
+      console.log('addPolygon');
+      // TODO
+    },
+    addRectangle () {
+      // TODO
+      console.log('addRectangle');
+      this.rectangles.push({
+        x: 150,
+        y: 150,
+        width: 100,
+        height: 100,
+        fill: 'green',
+        name: 'rect3',
+        draggable: true
+      });
+    },
+    addCircle () {
+      // TODO
+      console.log('addCircle');
+    },
+
     // handle scaling of canvas
     handleScroll (e) {
       if (e.evt) {
@@ -161,5 +190,24 @@ export default {
     }
   }
 };
-
 </script>
+
+<style lang="sass">
+.pa-container
+  position: relative
+
+.pa-controls
+  position: absolute
+  z-index: 100
+  background-color: white
+  padding: 0.3em
+  left: 1em
+  top: 1em
+  border: 1px solid #333
+  border-radius: 0.5em
+
+  a
+    color: #000
+    display: block
+    padding: 0.2em
+</style>
