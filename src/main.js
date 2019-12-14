@@ -29,6 +29,7 @@ for (let i = 0; i < $elements.length; i++) {
           containerId: this.$el.attributes.id || 'picture-annotation-' + Math.random(),
           language: (this.$el.attributes['data-language'] && this.$el.attributes['data-language'].value) || 'en',
           imageSrc: this.$el.attributes['data-image-src'] && this.$el.attributes['data-image-src'].value,
+          localStorageKey: this.$el.attributes['data-local-storage-key'] && this.$el.attributes['data-local-storage-key'].value,
           dataCallback: callback
         }
       });

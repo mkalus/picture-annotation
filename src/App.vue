@@ -27,10 +27,10 @@
       </v-layer>
       <v-layer ref="items">
         <template v-for="shape in shapes">
-          <v-rect v-if="shape.type === 'rect'" :config="shape" :key="shape.name" @dblclick="openAnnotation($event, shape.name)" @contextmenu="openContextMenu($event, shape.name)" @dragend="handleDragEnd($event, shape)" />
-          <v-circle v-if="shape.type === 'circle'" :config="shape" :key="shape.name" @dblclick="openAnnotation($event, shape.name)" @contextmenu="openContextMenu($event, shape.name)" @dragend="handleDragEnd($event, shape)" />
-          <v-line v-if="shape.type === 'poly'" :config="shape" :key="shape.name" @dblclick="openAnnotation($event, shape.name)" @contextmenu="openContextMenu($event, shape.name)" @dragend="handleDragEnd($event, shape)" />
-          <v-path v-if="shape.type === 'path'" :config="shape" :key="shape.name" @dblclick="openAnnotation($event, shape.name)" @contextmenu="openContextMenu($event, shape.name)" @dragend="handleDragEnd($event, shape)" />
+          <v-rect v-if="shape.type === 'rect'" :config="shape" :key="shape.name" @dblclick="openAnnotation($event, shape.name)" @contextmenu="openContextMenu($event, shape.name)" @dragend="handleDragEnd($event, shape)" @transformend="handleTransform($event, shape)" />
+          <v-circle v-if="shape.type === 'circle'" :config="shape" :key="shape.name" @dblclick="openAnnotation($event, shape.name)" @contextmenu="openContextMenu($event, shape.name)" @dragend="handleDragEnd($event, shape)" @transformend="handleTransform($event, shape)" />
+          <v-line v-if="shape.type === 'poly'" :config="shape" :key="shape.name" @dblclick="openAnnotation($event, shape.name)" @contextmenu="openContextMenu($event, shape.name)" @dragend="handleDragEnd($event, shape)" @transformend="handleTransform($event, shape)" />
+          <v-path v-if="shape.type === 'path'" :config="shape" :key="shape.name" @dblclick="openAnnotation($event, shape.name)" @contextmenu="openContextMenu($event, shape.name)" @dragend="handleDragEnd($event, shape)" @transformend="handleTransform($event, shape)" />
         </template>
         <v-transformer ref="transformer"/>
       </v-layer>
@@ -66,7 +66,7 @@ export default {
   components: {
     Icon
   },
-  props: ['language', 'containerId', 'imageSrc', 'dataCallback'],
+  props: ['language', 'containerId', 'imageSrc', 'dataCallback', 'localStorageKey'],
   data () {
     return {
       image: null,
@@ -94,6 +94,9 @@ export default {
   },
   mounted () {
     document.addEventListener('keydown', this.handleKeyEvent);
+
+    // try to load from local storage
+    this.load();
   },
   beforeDestroy () {
     document.removeEventListener('keydown', this.handleKeyEvent);
@@ -273,6 +276,14 @@ export default {
       // call update
       this.shapesUpdated();
     },
+    handleTransform (event, shape) {
+      shape.rotation = event.currentTarget.attrs.rotation;
+      shape.scaleX = event.currentTarget.attrs.scaleX;
+      shape.scaleY = event.currentTarget.attrs.scaleY;
+
+      // call update
+      this.shapesUpdated();
+    },
 
     // annotation handling
     openAnnotation (event, name) {
@@ -307,6 +318,17 @@ export default {
     shapesUpdated () {
       if (this.dataCallback && typeof this.dataCallback === 'function') {
         this.dataCallback(JSON.stringify(this.shapes));
+      }
+
+      // save to local storage, if defined
+      if (this.localStorageKey) {
+        localStorage.setItem(this.localStorageKey, JSON.stringify(this.shapes));
+      }
+    },
+    load () {
+      if (this.localStorageKey) {
+        const data = localStorage.getItem(this.localStorageKey) || '[]';
+        this.shapes = JSON.parse(data);
       }
     }
   }
