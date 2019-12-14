@@ -35,6 +35,24 @@
         <v-transformer ref="transformer"/>
       </v-layer>
     </v-stage>
+
+    <vue-simple-context-menu
+      :elementId="containerId + '-ctx-menu'"
+      :options="[{name: 'Edit'}, {name: 'Delete'}]"
+      :ref="'vueSimpleContextMenu'"
+      @option-clicked="contextMenuClicked"
+    />
+
+    <div class="pa-modal" v-show="showModal">
+      <div class="pa-modal-content">
+        <span class="pa-close" @click="showModal = false">&times;</span>
+        <p>TODO: Formular einfügen.</p>
+        <p>Some text in the Modal..</p>
+        <p>Some text in the Modal..</p>
+        <p>Some text in the Modal..</p>
+        <p>Some text in the Modal..</p>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -58,7 +76,8 @@ export default {
       },
       scale: 1, // current scale
       shapes: [], // shape container
-      selectedShapeName: '' // currently selected shape
+      selectedShapeName: '', // currently selected shape
+      showModal: false // modal is shown?
     };
   },
   // created live cycle hook
@@ -201,6 +220,9 @@ export default {
         // delete key pressed?
         if (event.key === 'Delete') this.deleteShape(this.selectedShapeName);
       }
+      if (this.showModal) { // modal shown
+        if (event.key === 'Escape') this.showModal = false;
+      }
     },
 
     // handle scaling of canvas
@@ -228,14 +250,31 @@ export default {
 
     // annotation handling
     openAnnotation (event, name) {
-      if (event.evt) event.evt.preventDefault();
-      alert('Annotate!'); // TODO
+      if (event && event.evt) event.evt.preventDefault();
+
+      this.showModal = true;
     },
 
     // open context menu handling
-    openContextMenu (event, name) {
-      if (event.evt) event.evt.preventDefault();
-      alert('ContextMenu!'); // TODO
+    openContextMenu (eventAll, name) {
+      if (eventAll.evt) {
+        const event = eventAll.evt;
+        event.preventDefault();
+
+        this.$refs.vueSimpleContextMenu.showMenu(event, name);
+      }
+    },
+    contextMenuClicked (event) {
+      if (event.option && event.option.name) {
+        switch (event.option.name) {
+          case 'Edit':
+            this.openAnnotation(null, this.selectedShapeName);
+            break;
+          case 'Delete':
+            this.deleteShape(this.selectedShapeName);
+            break;
+        }
+      }
     }
   }
 };
@@ -264,4 +303,33 @@ export default {
     color: #000
     padding: 0
     margin: 0.1em 0 0.3em 0
+
+.pa-modal
+  // display: none
+  position: fixed
+  z-index: 101
+  left: 0
+  top: 0
+  width: 100%
+  height: 100%
+  background-color: rgb(0,0,0)
+  background-color: rgba(0,0,0,0.4)
+
+.pa-modal-content
+  background-color: #fefefe
+  margin: 15% auto
+  padding: 20px
+  border: 1px solid #888
+  width: 80%
+
+.pa-close
+  color: #aaa
+  float: right
+  font-size: 28px
+  font-weight: bold
+
+.pa-close:hover, .pa-close:focus
+  color: black
+  text-decoration: none
+  cursor: pointer
 </style>
