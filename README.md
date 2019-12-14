@@ -22,3 +22,10 @@ npm run lint
 
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
+
+
+TODOs:
+* Übersetzungen
+* Polygone
+* Formular
+* Rückgabe der Werte

@@ -27,10 +27,10 @@
       </v-layer>
       <v-layer ref="items">
         <template v-for="shape in shapes">
-          <v-rect v-if="shape.type === 'rect'" :config="shape" :key="shape.name" @dblclick="openAnnotation($event, shape.name)" @contextmenu="openContextMenu($event, shape.name)" />
-          <v-circle v-if="shape.type === 'circle'" :config="shape" :key="shape.name" @dblclick="openAnnotation($event, shape.name)" @contextmenu="openContextMenu($event, shape.name)" />
-          <v-line v-if="shape.type === 'poly'" :config="shape" :key="shape.name" @dblclick="openAnnotation($event, shape.name)" @contextmenu="openContextMenu($event, shape.name)" />
-          <v-path v-if="shape.type === 'path'" :config="shape" :key="shape.name" @dblclick="openAnnotation($event, shape.name)" @contextmenu="openContextMenu($event, shape.name)" />
+          <v-rect v-if="shape.type === 'rect'" :config="shape" :key="shape.name" @dblclick="openAnnotation($event, shape.name)" @contextmenu="openContextMenu($event, shape.name)" @dragend="handleDragEnd($event, shape)" />
+          <v-circle v-if="shape.type === 'circle'" :config="shape" :key="shape.name" @dblclick="openAnnotation($event, shape.name)" @contextmenu="openContextMenu($event, shape.name)" @dragend="handleDragEnd($event, shape)" />
+          <v-line v-if="shape.type === 'poly'" :config="shape" :key="shape.name" @dblclick="openAnnotation($event, shape.name)" @contextmenu="openContextMenu($event, shape.name)" @dragend="handleDragEnd($event, shape)" />
+          <v-path v-if="shape.type === 'path'" :config="shape" :key="shape.name" @dblclick="openAnnotation($event, shape.name)" @contextmenu="openContextMenu($event, shape.name)" @dragend="handleDragEnd($event, shape)" />
         </template>
         <v-transformer ref="transformer"/>
       </v-layer>
@@ -66,9 +66,9 @@ export default {
   components: {
     Icon
   },
+  props: ['language', 'containerId', 'imageSrc', 'dataCallback'],
   data () {
     return {
-      containerId: 'basic-test-container', // dummy, set later TODO
       image: null,
       stageSize: {
         width: width,
@@ -84,7 +84,7 @@ export default {
   created () {
     // load image
     const image = new window.Image();
-    image.src = './example/example.jpg';
+    image.src = this.imageSrc;
     image.onload = () => {
       // set image only when it is loaded
       this.image = image;
@@ -153,8 +153,13 @@ export default {
       this.shapes.push({
         ...this.getBaseShape('poly'),
         points: [23, 20, 23, 160, 70, 93, 150, 109, 290, 139, 270, 93], // TODO: addPoly Layer + Function
-        closed: true
+        closed: true,
+        x: 150,
+        y: 150
       });
+
+      // call update
+      this.shapesUpdated();
     },
     addRectangle () {
       this.shapes.push({
@@ -164,6 +169,9 @@ export default {
         width: 100,
         height: 100
       });
+
+      // call update
+      this.shapesUpdated();
     },
     addCircle () {
       this.shapes.push({
@@ -172,6 +180,9 @@ export default {
         y: 150,
         radius: 100
       });
+
+      // call update
+      this.shapesUpdated();
     },
 
     addPerson () {
@@ -185,6 +196,9 @@ export default {
           y: 2
         }
       });
+
+      // call update
+      this.shapesUpdated();
     },
 
     getBaseShape (type) {
@@ -210,6 +224,9 @@ export default {
         }
 
         this.shapes.splice(idx, 1);
+
+        // call update
+        this.shapesUpdated();
       }
     },
 
@@ -248,6 +265,15 @@ export default {
       this.scale = scale;
     },
 
+    // handle manipulation events
+    handleDragEnd (event, shape) {
+      shape.x = event.currentTarget.attrs.x;
+      shape.y = event.currentTarget.attrs.y;
+
+      // call update
+      this.shapesUpdated();
+    },
+
     // annotation handling
     openAnnotation (event, name) {
       if (event && event.evt) event.evt.preventDefault();
@@ -274,6 +300,13 @@ export default {
             this.deleteShape(this.selectedShapeName);
             break;
         }
+      }
+    },
+
+    // callback on update
+    shapesUpdated () {
+      if (this.dataCallback && typeof this.dataCallback === 'function') {
+        this.dataCallback(JSON.stringify(this.shapes));
       }
     }
   }
