@@ -11,13 +11,23 @@
   <body>
     <script type="application/javascript">
       function callBack(data) {
-        console.log(data);
+        document.getElementById('output').innerHTML = data;
       }
     </script>
     <noscript>
       <strong>We're sorry but picture-annotation doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
     </noscript>
-    <div id="my-pic-annotation" class="picture-annotation" data-language="de" data-image-src="./example/example.jpg" data-callback="callBack" data-local-storage-key="storage" data-width="1200" data-height="600"></div>
+    <div style="border: 1px solid #000; width: 1200px; height: 600px;">
+      <div id="my-pic-annotation" class="picture-annotation" data-language="de" data-image-src="./example/example.jpg" data-callback="callBack" data-local-storage-key="storage" data-width="1200" data-height="600"></div>
+    </div>
+
+    <div>
+      <textarea id="output" style="width: 80%; height: 200px;"></textarea>
+    </div>
+
+    <div style="border: 1px solid #f00; width: 1200px; height: 600px;">
+      <div id="my-pic-annotation-output" class="picture-annotation" data-language="de" data-image-src="./example/example.jpg" data-width="1200" data-height="600"></div>
+    </div>
     <!-- built files will be auto injected -->
   </body>
 </html>

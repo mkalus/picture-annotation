@@ -235,7 +235,7 @@ export default {
         draggable: true,
         strokeWidth: 2,
         strokeScaleEnabled: false,
-        data: {
+        annotation: {
           title: '',
           text: '',
           linkTitle: '',
@@ -322,7 +322,7 @@ export default {
       if (idx >= 0) {
         // copy data of shape to form in order to edit it (no direct binding!)
         this.formData = {
-          ...this.shapes[idx].data
+          ...this.shapes[idx].annotation
         };
         this.showModal = true;
       }
@@ -331,7 +331,7 @@ export default {
       // copy back form data to shape data
       const idx = this.shapes.findIndex(r => r.name === this.selectedShapeName);
       if (idx >= 0) {
-        this.shapes[idx].data = {
+        this.shapes[idx].annotation = {
           ...this.formData
         };
 
