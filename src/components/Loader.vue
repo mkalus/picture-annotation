@@ -11,7 +11,7 @@
   left: 0
   top: 0
   width: 100%
-  height: 100vh
+  height: 100%
   background-color: rgb(0,0,0)
   background-color: rgba(0,0,0,0.4)
 
@@ -19,14 +19,14 @@
 .lds-ring
   display: inline-block
   position: relative
-  width: 180px
-  height: 180px
+  width: 100%
+  height: 100%
 
 .lds-ring div
   box-sizing: border-box
   display: block
-  top: 30vh
-  left: calc(50vw - 82px)
+  top: 30%
+  left: calc(50% - 82px)
   position: absolute
   width: 164px
   height: 164px

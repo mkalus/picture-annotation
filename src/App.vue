@@ -59,22 +59,19 @@ import Icon from './components/Icon';
 import AnnotationForm from './components/AnnotationForm';
 import Loader from './components/Loader';
 
-const width = window.innerWidth;
-const height = window.innerHeight;
-
 export default {
   components: {
     Icon,
     AnnotationForm,
     Loader
   },
-  props: ['language', 'containerId', 'imageSrc', 'dataCallback', 'localStorageKey'],
+  props: ['language', 'containerId', 'imageSrc', 'dataCallback', 'localStorageKey', 'width', 'height'],
   data () {
     return {
       image: null,
       stageSize: {
-        width: width,
-        height: height
+        width: null,
+        height: null
       },
       scale: 1, // current scale
       shapes: [], // shape container
@@ -91,14 +88,22 @@ export default {
   },
   // created live cycle hook
   created () {
+    // set defaults
+    this.stageSize.width = parseInt(this.width);
+    this.stageSize.height = parseInt(this.height);
+
+    if (!this.stageSize.width || isNaN(this.stageSize.width)) this.stageSize.width = window.innerWidth;
+    if (!this.stageSize.height || isNaN(this.stageSize.height)) this.stageSize.height = window.innerHeight;
+
     // load image
     const image = new window.Image();
     image.src = this.imageSrc;
     image.onload = () => {
       // set image only when it is loaded
       this.image = image;
+
       // adapt initial scale to fit canvas
-      this.changeScale(-Math.max(width / image.width, height / image.height));
+      this.changeScale(-1 + Math.min(this.stageSize.width / image.width, this.stageSize.height / image.height));
       // loading finished
       this.isLoading = false;
     };
@@ -271,6 +276,7 @@ export default {
     handleScroll (e) {
       if (e.evt) {
         const event = e.evt;
+        event.preventDefault();
 
         // Normalize wheel to +1 or -1.
         const wheel = event.deltaY < 0 ? 1 : -1;

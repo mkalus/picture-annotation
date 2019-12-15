@@ -75,6 +75,8 @@ for (let i = 0; i < $elements.length; i++) {
           language: (this.$el.attributes['data-language'] && this.$el.attributes['data-language'].value) || 'en',
           imageSrc: this.$el.attributes['data-image-src'] && this.$el.attributes['data-image-src'].value,
           localStorageKey: this.$el.attributes['data-local-storage-key'] && this.$el.attributes['data-local-storage-key'].value,
+          width: (this.$el.attributes['data-width'] && this.$el.attributes['data-width'].value) || $el.innerWidth,
+          height: (this.$el.attributes['data-height'] && this.$el.attributes['data-height'].value) || $el.innerHeight,
           dataCallback: callback
         }
       });
