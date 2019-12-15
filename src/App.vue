@@ -178,7 +178,7 @@ export default {
         ...this.getBaseShape('poly'),
         points: [23, 20, 23, 160, 70, 93, 150, 109, 290, 139, 270, 93], // TODO: addPoly Layer + Function
         closed: true,
-        x: 150,
+        x: 180,
         y: 150
       });
 
@@ -188,10 +188,10 @@ export default {
     addRectangle () {
       this.shapes.push({
         ...this.getBaseShape('rect'),
-        x: 150,
-        y: 150,
-        width: 100,
-        height: 100
+        x: 80 / this.scale,
+        y: 50 / this.scale,
+        width: 200 / this.scale,
+        height: 200 / this.scale
       });
 
       // call update
@@ -200,9 +200,9 @@ export default {
     addCircle () {
       this.shapes.push({
         ...this.getBaseShape('circle'),
-        x: 150,
-        y: 150,
-        radius: 100
+        x: 180 / this.scale,
+        y: 200 / this.scale,
+        radius: 100 / this.scale
       });
 
       // call update
@@ -212,12 +212,12 @@ export default {
     addPerson () {
       this.shapes.push({
         ...this.getBaseShape('path'),
-        x: 250,
-        y: 250,
+        x: 80 / this.scale,
+        y: 80 / this.scale,
         data: 'm 105.61519,0 a 52.807596,52.807596 0 1 1 0,105.61519 52.807596,52.807596 0 0 1 0,-105.61519 m 0,105.61519 c 58.3524,0 105.61522,23.63141 105.61522,52.8076 V 264.038 H 0 V 158.42279 c 0,-29.17619 47.262803,-52.8076 105.61519,-52.8076 z',
         scale: {
-          x: 2,
-          y: 2
+          x: 1 / this.scale,
+          y: 1 / this.scale
         }
       });
 
