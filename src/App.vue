@@ -1,16 +1,16 @@
 <template>
   <div :id="containerId" class="pa-container">
     <div class="pa-controls">
-      <a href="#" @click.prevent="changeScale(0.1)"><icon type="zoom-in" /></a>
-      <a href="#" @click.prevent="changeScale(-0.1)"><icon type="zoom-out" /></a>
+      <a href="#" @click.prevent="changeScale(0.1)" :title="$t('zoom_in')"><icon type="zoom-in" /></a>
+      <a href="#" @click.prevent="changeScale(-0.1)" :title="$t('zoom_out')"><icon type="zoom-out" /></a>
       <hr />
-      <a href="#" @click.prevent="addPolygon"><icon type="add-polygon" /></a>
-      <a href="#" @click.prevent="addRectangle"><icon type="add-rectangle" /></a>
-      <a href="#" @click.prevent="addCircle"><icon type="add-circle" /></a>
-      <a href="#" @click.prevent="addPerson"><icon type="add-person" /></a>
+      <a href="#" @click.prevent="addPolygon" :title="$t('add_polygon')"><icon type="add-polygon" /></a>
+      <a href="#" @click.prevent="addRectangle" :title="$t('add_rectangle')"><icon type="add-rectangle" /></a>
+      <a href="#" @click.prevent="addCircle" :title="$t('add_circle')"><icon type="add-circle" /></a>
+      <a href="#" @click.prevent="addPerson" :title="$t('add_person')"><icon type="add-person" /></a>
       <hr />
-      <a href="#" @click.prevent="openAnnotation(selectedShapeName)"><icon type="edit-shape" :fill="selectedShapeName ? 'green' : 'gray'" /></a>
-      <a href="#" @click.prevent="deleteShape(selectedShapeName)"><icon type="delete-shape" :fill="selectedShapeName ? 'red' : 'gray'" /></a>
+      <a href="#" @click.prevent="openAnnotation(selectedShapeName)" :title="$t('open_annotation')"><icon type="edit-shape" :fill="selectedShapeName ? 'green' : 'gray'" /></a>
+      <a href="#" @click.prevent="deleteShape(selectedShapeName)" :title="$t('delete_shape')"><icon type="delete-shape" :fill="selectedShapeName ? 'red' : 'gray'" /></a>
     </div>
 
     <v-stage :config="{
@@ -38,7 +38,7 @@
 
     <vue-simple-context-menu
       :elementId="containerId + '-ctx-menu'"
-      :options="[{name: 'Edit'}, {name: 'Delete'}]"
+      :options="[{name: $t('edit'), action: 'edit'}, {name: $t('delete'), action: 'delete'}]"
       :ref="'vueSimpleContextMenu'"
       @option-clicked="contextMenuClicked"
     />
@@ -94,6 +94,11 @@ export default {
   },
   mounted () {
     document.addEventListener('keydown', this.handleKeyEvent);
+
+    // set language
+    if (this.language) {
+      this.$i18n.locale = this.language;
+    }
 
     // try to load from local storage
     this.load();
@@ -303,11 +308,11 @@ export default {
     },
     contextMenuClicked (event) {
       if (event.option && event.option.name) {
-        switch (event.option.name) {
-          case 'Edit':
+        switch (event.option.action) {
+          case 'edit':
             this.openAnnotation(null, this.selectedShapeName);
             break;
-          case 'Delete':
+          case 'delete':
             this.deleteShape(this.selectedShapeName);
             break;
         }
