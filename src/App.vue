@@ -36,6 +36,8 @@
       </v-layer>
     </v-stage>
 
+    <loader v-if="isLoading" />
+
     <vue-simple-context-menu
       :elementId="containerId + '-ctx-menu'"
       :options="[{name: $t('edit'), action: 'edit'}, {name: $t('delete'), action: 'delete'}]"
@@ -55,6 +57,7 @@
 <script>
 import Icon from './components/Icon';
 import AnnotationForm from './components/AnnotationForm';
+import Loader from './components/Loader';
 
 const width = window.innerWidth;
 const height = window.innerHeight;
@@ -62,7 +65,8 @@ const height = window.innerHeight;
 export default {
   components: {
     Icon,
-    AnnotationForm
+    AnnotationForm,
+    Loader
   },
   props: ['language', 'containerId', 'imageSrc', 'dataCallback', 'localStorageKey'],
   data () {
@@ -76,6 +80,7 @@ export default {
       shapes: [], // shape container
       selectedShapeName: '', // currently selected shape
       showModal: false, // modal is shown?
+      isLoading: true, // loading image?
       formData: {
         title: '',
         text: '',
@@ -94,6 +99,8 @@ export default {
       this.image = image;
       // adapt initial scale to fit canvas
       this.changeScale(-Math.max(width / image.width, height / image.height));
+      // loading finished
+      this.isLoading = false;
     };
   },
   mounted () {
@@ -407,7 +414,6 @@ export default {
     margin: 0.1em 0 0.3em 0
 
 .pa-modal
-  // display: none
   position: fixed
   z-index: 101
   left: 0
