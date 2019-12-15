@@ -304,30 +304,36 @@ export default {
     openAnnotation (event, name) {
       if (event && event.evt) event.evt.preventDefault();
 
+      // find shape
       const idx = this.shapes.findIndex(r => r.name === name);
       if (idx >= 0) {
+        // copy data of shape to form in order to edit it (no direct binding!)
         this.formData = {
           ...this.shapes[idx].data
         };
-        this.showModal = true; // TODO
-      } else {
-        this.formData = {
+        this.showModal = true;
+      }
+    },
+    formSubmitted () {
+      // copy back form data to shape data
+      const idx = this.shapes.findIndex(r => r.name === this.selectedShapeName);
+      if (idx >= 0) {
+        this.shapes[idx].data = {
+          ...this.formData
+        };
+
+        // callback/persist
+        this.shapesUpdated();
+      }
+
+      // reset form data
+      this.formData = {
+        ...{
           title: '',
           text: '',
           linkTitle: '',
           link: ''
-        };
-      }
-    },
-    formSubmitted () {
-      console.log(this.formData);
-
-      // reset data TODO
-      this.formData = {
-        title: '',
-        text: '',
-        linkTitle: '',
-        link: ''
+        }
       };
 
       this.showModal = false;

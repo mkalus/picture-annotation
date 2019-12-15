@@ -1,13 +1,13 @@
 <template>
   <form class="pa-annotation-form" @submit.prevent="submitted">
     <label :for="containerId + '-title'">{{ $t('annotation_title') }}</label>
-    <input type="text" name="title" :id="containerId + '-title'" v-model="title">
+    <input type="text" name="title" :id="containerId + '-title'" v-model="value.title">
     <label :for="containerId + '-text'">{{ $t('annotation_text') }}</label>
-    <textarea name="text" :id="containerId + '-text'" v-model="text" />
+    <textarea name="text" :id="containerId + '-text'" v-model="value.text" />
     <label :for="containerId + '-link-title'">{{ $t('annotation_link_title') }}</label>
-    <input type="text" name="link-title" :id="containerId + '-link-title'" v-model="linkTitle">
+    <input type="text" name="link-title" :id="containerId + '-link-title'" v-model="value.linkTitle">
     <label :for="containerId + '-link'">{{ $t('annotation_link') }}</label>
-    <input type="text" name="link" :id="containerId + '-link'" v-model="link">
+    <input type="text" name="link" :id="containerId + '-link'" v-model="value.link">
     <button type="submit">{{ $t('submit') }}</button>
   </form>
 </template>
@@ -15,30 +15,8 @@
 <script>
 export default {
   props: ['value', 'containerId'],
-  data () {
-    return {
-      title: '',
-      text: '',
-      linkTitle: '',
-      link: ''
-    };
-  },
-  mounted () {
-    console.log(this.title);
-    // this.title = this.model.title;
-    // this.text = this.model.text;
-    // this.linkTitle = this.model.linkTitle;
-    // this.link = this.model.link;
-  },
   methods: {
     submitted () {
-      /* this.model.data = {
-        title: this.title,
-        text: this.text,
-        linkTitle: this.linkTitle,
-        link: this.link
-      }; */
-
       this.$emit('annotation-finished');
     }
   }
