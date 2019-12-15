@@ -1,33 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <link rel="icon" href="<%= BASE_URL %>favicon.ico">
     <title>picture-annotation</title>
-    <link rel="stylesheet" href="css/reset.css" />
-  </head>
-  <body>
-    <script type="application/javascript">
-      function callBack(data) {
+    <link rel="stylesheet" href="css/reset.css"/>
+</head>
+<body>
+<script type="application/javascript">
+    function callBack(data) {
         document.getElementById('output').innerHTML = data;
-      }
-    </script>
-    <noscript>
-      <strong>We're sorry but picture-annotation doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
-    </noscript>
-    <div style="border: 1px solid #000; width: 1200px; height: 600px;">
-      <div id="my-pic-annotation" class="picture-annotation" data-language="de" data-image-src="./example/example.jpg" data-callback="callBack" data-local-storage-key="storage" data-width="1200" data-height="600"></div>
-    </div>
+    }
+</script>
+<noscript>
+    <strong>We're sorry but picture-annotation doesn't work properly without JavaScript enabled. Please enable it to
+        continue.</strong>
+</noscript>
+<p>Edit:</p>
+<div style="border: 1px solid #000; width: 1200px; height: 600px;">
+    <div id="my-pic-annotation" class="picture-annotation" data-language="de" data-image-src="./example/example.jpg"
+         data-callback="callBack" data-local-storage-key="storage" data-width="1200" data-height="600"
+         data-edit-mode="1"></div>
+</div>
 
-    <div>
-      <textarea id="output" style="width: 80%; height: 200px;"></textarea>
-    </div>
+<p>Data:</p>
+<div>
+    <textarea id="output" style="width: 80%; height: 200px;"></textarea>
+</div>
 
-    <div style="border: 1px solid #f00; width: 1200px; height: 600px;">
-      <div id="my-pic-annotation-output" class="picture-annotation" data-language="de" data-image-src="./example/example.jpg" data-width="1200" data-height="600"></div>
+<p>Show:</p>
+<div style="border: 1px solid #f00; width: 1200px; height: 600px;">
+    <div id="my-pic-annotation-output" class="picture-annotation" data-language="de"
+         data-image-src="./example/example.jpg" data-width="1200" data-height="600">
+      <div class="picture-annotation-data" style="display:none;">[{"type":"circle","name":"shape-1576445949348","fill":"lightsteelblue","opacity":0.5,"stroke":"blue","draggable":true,"strokeWidth":2,"strokeScaleEnabled":false,"annotation":{"title":"Linkes Auge","text":"","linkTitle":"","link":""},"x":1424.0197279303554,"y":1057.8125,"radius":500.0000000000001,"rotation":0,"scaleX":0.28888277858212413,"scaleY":0.23390718562874266},{"type":"circle","name":"shape-1576445952913","fill":"lightsteelblue","opacity":0.5,"stroke":"blue","draggable":true,"strokeWidth":2,"strokeScaleEnabled":false,"annotation":{"title":"Rechtes Auge","text":"","linkTitle":"","link":""},"x":2529.3750000000005,"y":1103.7500000000002,"radius":500.0000000000001,"rotation":0,"scaleX":0.3025199600798404,"scaleY":0.23078842315369255},{"type":"rect","name":"shape-1576445992087","fill":"lightsteelblue","opacity":0.5,"stroke":"blue","draggable":true,"strokeWidth":2,"strokeScaleEnabled":false,"annotation":{"title":"Container","text":"Der Container nimmt einfach alles.\n\n... hoffentlich!","linkTitle":"Zum Begriff","link":"https://de.wikipedia.org/wiki/Container"},"x":977.2727272727274,"y":1363.6363636363635,"width":909.0909090909092,"height":909.0909090909092,"rotation":0,"scaleX":2.259529036120535,"scaleY":1.4514069048094191},{"type":"poly","name":"shape-1576446003438","fill":"lightsteelblue","opacity":0.5,"stroke":"blue","draggable":true,"strokeWidth":2,"strokeScaleEnabled":false,"annotation":{"title":"Gras","text":"","linkTitle":"","link":"https://de.wikipedia.org/wiki/Gras"},"points":[23,20,23,160,70,93,150,109,290,139,270,93],"closed":true,"x":151.42973434462874,"y":2730.092427968213,"rotation":-87.56841778259472,"scaleX":3.221406709045316,"scaleY":3.2402490948634624},{"type":"path","name":"shape-1576446645126","fill":"lightsteelblue","opacity":0.5,"stroke":"blue","draggable":true,"strokeWidth":2,"strokeScaleEnabled":false,"annotation":{"title":"Geist","text":"","linkTitle":"","link":"https://de.wikipedia.org/wiki/Geistwesen"},"x":3155.0000000000005,"y":1335.0000000000002,"data":"m 105.61519,0 a 52.807596,52.807596 0 1 1 0,105.61519 52.807596,52.807596 0 0 1 0,-105.61519 m 0,105.61519 c 58.3524,0 105.61522,23.63141 105.61522,52.8076 V 264.038 H 0 V 158.42279 c 0,-29.17619 47.262803,-52.8076 105.61519,-52.8076 z","scale":{"x":5.000000000000001,"y":5.000000000000001},"rotation":0,"scaleX":3.591549295774646,"scaleY":4.530075187969928}]</div>
     </div>
-    <!-- built files will be auto injected -->
-  </body>
+</div>
+<!-- built files will be auto injected -->
+</body>
 </html>

@@ -1,6 +1,6 @@
 <template>
   <div :id="containerId" class="pa-container">
-    <div class="pa-controls">
+    <div class="pa-controls" v-if="editMode">
       <a href="#" @click.prevent="changeScale(0.1)" :title="$t('zoom_in')"><icon type="zoom-in" /></a>
       <a href="#" @click.prevent="changeScale(-0.1)" :title="$t('zoom_out')"><icon type="zoom-out" /></a>
       <hr />
@@ -19,7 +19,7 @@
       scaleX: scale,
       scaleY: scale,
       draggable: true
-    }" @mousedown="handleStageMouseDown" @wheel="handleScroll">
+    }" @mousedown="handleStageMouseDown" @wheel="handleScroll" :ref="'stage'">
       <v-layer ref="background">
         <v-image :config="{
             image: image
@@ -27,12 +27,24 @@
       </v-layer>
       <v-layer ref="items">
         <template v-for="shape in shapes">
-          <v-rect v-if="shape.type === 'rect'" :config="shape" :key="shape.name" @dblclick="openAnnotation($event, shape.name)" @contextmenu="openContextMenu($event, shape.name)" @dragend="handleDragEnd($event, shape)" @transformend="handleTransform($event, shape)" />
-          <v-circle v-if="shape.type === 'circle'" :config="shape" :key="shape.name" @dblclick="openAnnotation($event, shape.name)" @contextmenu="openContextMenu($event, shape.name)" @dragend="handleDragEnd($event, shape)" @transformend="handleTransform($event, shape)" />
-          <v-line v-if="shape.type === 'poly'" :config="shape" :key="shape.name" @dblclick="openAnnotation($event, shape.name)" @contextmenu="openContextMenu($event, shape.name)" @dragend="handleDragEnd($event, shape)" @transformend="handleTransform($event, shape)" />
-          <v-path v-if="shape.type === 'path'" :config="shape" :key="shape.name" @dblclick="openAnnotation($event, shape.name)" @contextmenu="openContextMenu($event, shape.name)" @dragend="handleDragEnd($event, shape)" @transformend="handleTransform($event, shape)" />
+          <v-rect v-if="shape.type === 'rect'" :config="shape" :key="shape.name"
+                  @dblclick="openAnnotation($event, shape.name)" @contextmenu="openContextMenu($event, shape.name)"
+                  @dragend="handleDragEnd($event, shape)" @transformend="handleTransform($event, shape)"
+                  @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave"/>
+          <v-circle v-if="shape.type === 'circle'" :config="shape" :key="shape.name"
+                    @dblclick="openAnnotation($event, shape.name)" @contextmenu="openContextMenu($event, shape.name)"
+                    @dragend="handleDragEnd($event, shape)" @transformend="handleTransform($event, shape)"
+                    @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave"/>
+          <v-line v-if="shape.type === 'poly'" :config="shape" :key="shape.name"
+                  @dblclick="openAnnotation($event, shape.name)" @contextmenu="openContextMenu($event, shape.name)"
+                  @dragend="handleDragEnd($event, shape)" @transformend="handleTransform($event, shape)"
+                  @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave"/>
+          <v-path v-if="shape.type === 'path'" :config="shape" :key="shape.name"
+                  @dblclick="openAnnotation($event, shape.name)" @contextmenu="openContextMenu($event, shape.name)"
+                  @dragend="handleDragEnd($event, shape)" @transformend="handleTransform($event, shape)"
+                  @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave"/>
         </template>
-        <v-transformer ref="transformer"/>
+        <v-transformer ref="transformer" v-if="editMode"/>
       </v-layer>
     </v-stage>
 
@@ -45,7 +57,7 @@
       @option-clicked="contextMenuClicked"
     />
 
-    <div class="pa-modal" v-show="showModal">
+    <div class="pa-modal" v-show="showModal" v-if="editMode">
       <div class="pa-modal-content">
         <span class="pa-close" @click="showModal = false">&times;</span>
         <annotation-form :container-id="containerId" v-model="formData" v-on:annotation-finished="formSubmitted()"/>
@@ -65,7 +77,7 @@ export default {
     AnnotationForm,
     Loader
   },
-  props: ['language', 'containerId', 'imageSrc', 'dataCallback', 'localStorageKey', 'width', 'height'],
+  props: ['language', 'containerId', 'imageSrc', 'dataCallback', 'localStorageKey', 'width', 'height', 'editMode', 'initialData'],
   data () {
     return {
       image: null,
@@ -109,34 +121,42 @@ export default {
     };
   },
   mounted () {
-    document.addEventListener('keydown', this.handleKeyEvent);
+    if (this.editMode) {
+      document.addEventListener('keydown', this.handleKeyEvent);
+    }
 
     // set language
     if (this.language) {
       this.$i18n.locale = this.language;
     }
 
-    // try to load from local storage
+    // try to load from local storage or local data
     this.load();
   },
   beforeDestroy () {
-    document.removeEventListener('keydown', this.handleKeyEvent);
+    if (this.editMode) {
+      document.removeEventListener('keydown', this.handleKeyEvent);
+    }
   },
   methods: {
     // handle transformation of elements
     handleStageMouseDown (e) {
-      // clicked on stage - clear selection
-      if (e.target === e.target.getStage()) {
-        this.selectedShapeName = '';
-        this.updateTransformer();
-        return;
-      }
+      if (this.editMode) {
+        // edit mode only
 
-      // clicked on transformer - do nothing
-      const clickedOnTransformer =
-        e.target.getParent().className === 'Transformer';
-      if (clickedOnTransformer) {
-        return;
+        // clicked on stage - clear selection
+        if (e.target === e.target.getStage()) {
+          this.selectedShapeName = '';
+          this.updateTransformer();
+          return;
+        }
+
+        // clicked on transformer - do nothing
+        const clickedOnTransformer =
+          e.target.getParent().className === 'Transformer';
+        if (clickedOnTransformer) {
+          return;
+        }
       }
 
       // find clicked shape by its name
@@ -148,9 +168,15 @@ export default {
         this.selectedShapeName = '';
       }
 
-      this.updateTransformer();
+      if (this.editMode) {
+        this.updateTransformer();
+      } else {
+        if (this.selectedShapeName) this.showShapeInformation(this.selectedShapeName);
+      }
     },
     updateTransformer () {
+      if (!this.editMode) return; // edit mode only
+
       // here we need to manually attach or detach Transformer node
       const transformerNode = this.$refs.transformer.getStage();
       const stage = transformerNode.getStage();
@@ -313,8 +339,22 @@ export default {
       this.shapesUpdated();
     },
 
+    // handle show stuff
+    handleMouseEnter () {
+      this.$refs.stage.getStage().container().style.cursor = 'pointer';
+    },
+    handleMouseLeave () {
+      this.$refs.stage.getStage().container().style.cursor = 'default';
+    },
+    showShapeInformation (name) {
+      // TODO: information window
+      console.log(name);
+    },
+
     // annotation handling
     openAnnotation (event, name) {
+      if (!this.editMode) return; // edit mode only
+
       if (event && event.evt) event.evt.preventDefault();
 
       // find shape
@@ -354,6 +394,8 @@ export default {
 
     // open context menu handling
     openContextMenu (eventAll, name) {
+      if (!this.editMode) return; // edit mode only
+
       if (eventAll.evt) {
         const event = eventAll.evt;
         event.preventDefault();
@@ -386,9 +428,16 @@ export default {
       }
     },
     load () {
-      if (this.localStorageKey) {
+      if (this.initialData && this.initialData.length > 0) {
+        this.shapes = JSON.parse(this.initialData);
+      } else if (this.localStorageKey) {
         const data = localStorage.getItem(this.localStorageKey) || '[]';
         this.shapes = JSON.parse(data);
+      }
+
+      // if we only show data, remove draggable from it
+      if (!this.editMode) {
+        this.shapes.forEach(shape => shape.draggable && delete shape.draggable);
       }
     }
   }
@@ -431,7 +480,7 @@ export default {
 
 .pa-modal-content
   background-color: #fefefe
-  margin: 15% auto
+  margin: 5% auto
   padding: 20px
   border: 1px solid #888
   width: 500px
