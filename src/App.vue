@@ -46,11 +46,7 @@
     <div class="pa-modal" v-show="showModal">
       <div class="pa-modal-content">
         <span class="pa-close" @click="showModal = false">&times;</span>
-        <p>TODO: Formular einfügen.</p>
-        <p>Some text in the Modal..</p>
-        <p>Some text in the Modal..</p>
-        <p>Some text in the Modal..</p>
-        <p>Some text in the Modal..</p>
+        <annotation-form :container-id="containerId" v-model="formData" v-on:annotation-finished="formSubmitted()"/>
       </div>
     </div>
   </div>
@@ -58,13 +54,15 @@
 
 <script>
 import Icon from './components/Icon';
+import AnnotationForm from './components/AnnotationForm';
 
 const width = window.innerWidth;
 const height = window.innerHeight;
 
 export default {
   components: {
-    Icon
+    Icon,
+    AnnotationForm
   },
   props: ['language', 'containerId', 'imageSrc', 'dataCallback', 'localStorageKey'],
   data () {
@@ -77,7 +75,13 @@ export default {
       scale: 1, // current scale
       shapes: [], // shape container
       selectedShapeName: '', // currently selected shape
-      showModal: false // modal is shown?
+      showModal: false, // modal is shown?
+      formData: {
+        title: '',
+        text: '',
+        linkTitle: '',
+        link: ''
+      }
     };
   },
   // created live cycle hook
@@ -218,7 +222,13 @@ export default {
         stroke: 'blue',
         draggable: true,
         strokeWidth: 2,
-        strokeScaleEnabled: false
+        strokeScaleEnabled: false,
+        data: {
+          title: '',
+          text: '',
+          linkTitle: '',
+          link: ''
+        }
       };
     },
 
@@ -294,7 +304,33 @@ export default {
     openAnnotation (event, name) {
       if (event && event.evt) event.evt.preventDefault();
 
-      this.showModal = true;
+      const idx = this.shapes.findIndex(r => r.name === name);
+      if (idx >= 0) {
+        this.formData = {
+          ...this.shapes[idx].data
+        };
+        this.showModal = true; // TODO
+      } else {
+        this.formData = {
+          title: '',
+          text: '',
+          linkTitle: '',
+          link: ''
+        };
+      }
+    },
+    formSubmitted () {
+      console.log(this.formData);
+
+      // reset data TODO
+      this.formData = {
+        title: '',
+        text: '',
+        linkTitle: '',
+        link: ''
+      };
+
+      this.showModal = false;
     },
 
     // open context menu handling
@@ -380,7 +416,7 @@ export default {
   margin: 15% auto
   padding: 20px
   border: 1px solid #888
-  width: 80%
+  width: 500px
 
 .pa-close
   color: #aaa

@@ -26,7 +26,12 @@ const i18n = new VueI18n({
       open_annotation: 'Annotate shape',
       delete_shape: 'Delete shape',
       edit: 'Annotate',
-      delete: 'Delete'
+      delete: 'Delete',
+      annotation_title: 'Title',
+      annotation_text: 'Text',
+      annotation_link_title: 'Link title',
+      annotation_link: 'Link',
+      submit: 'Change'
     },
     de: {
       zoom_in: 'Vergrößern',
@@ -38,7 +43,12 @@ const i18n = new VueI18n({
       open_annotation: 'Daten eingeben',
       delete_shape: 'Löschen',
       edit: 'Daten',
-      delete: 'Löschen'
+      delete: 'Löschen',
+      annotation_title: 'Titel',
+      annotation_text: 'Text',
+      annotation_link_title: 'Link-Titel',
+      annotation_link: 'Link',
+      submit: 'Ändern'
     }
   }
 });
