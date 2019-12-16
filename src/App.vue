@@ -123,6 +123,7 @@ export default {
   mounted () {
     if (this.editMode) {
       document.addEventListener('keydown', this.handleKeyEvent);
+      document.addEventListener('mousedown', this.handleFocusEvent);
     }
 
     // set language
@@ -136,6 +137,7 @@ export default {
   beforeDestroy () {
     if (this.editMode) {
       document.removeEventListener('keydown', this.handleKeyEvent);
+      document.removeEventListener('mousedown', this.handleFocusEvent);
     }
   },
   methods: {
@@ -196,6 +198,14 @@ export default {
         transformerNode.detach();
       }
       transformerNode.getLayer().batchDraw();
+    },
+    handleFocusEvent (e) {
+      // remove focus if not clicked on element
+      if (e.target.nodeName !== 'CANVAS' || e.target !== this.$refs.items.getStage().canvas._canvas) {
+        // this is not elegant - any nicer way?
+        this.selectedShapeName = '';
+        this.updateTransformer();
+      }
     },
 
     // handle additions

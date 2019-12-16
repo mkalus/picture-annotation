@@ -27,4 +27,3 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 TODOs:
 * Anzeige
 * Polygone
-* Delete: Check focus...
