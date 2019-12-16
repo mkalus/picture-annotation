@@ -12,7 +12,7 @@
     "@mdi/js": "^4.7.95",
     "core-js": "^3.5.0",
     "konva": "^4.0.18",
-    "vue": "^2.6.10",
+    "vue": "^2.6.11",
     "vue-i18n": "^8.15.1",
     "vue-konva": "^2.1.1",
     "vue-simple-context-menu": "^3.1.7"
@@ -31,6 +31,6 @@
     "eslint-plugin-vue": "^6.0.1",
     "sass": "^1.23.7",
     "sass-loader": "^8.0.0",
-    "vue-template-compiler": "^2.6.10"
+    "vue-template-compiler": "^2.6.11"
   }
 }
