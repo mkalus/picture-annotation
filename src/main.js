@@ -31,7 +31,8 @@ const i18n = new VueI18n({
       annotation_text: 'Text',
       annotation_link_title: 'Link title',
       annotation_link: 'Link',
-      submit: 'Change'
+      submit: 'Change',
+      more: 'More'
     },
     de: {
       zoom_in: 'Vergrößern',
@@ -48,7 +49,8 @@ const i18n = new VueI18n({
       annotation_text: 'Text',
       annotation_link_title: 'Link-Titel',
       annotation_link: 'Link',
-      submit: 'Ändern'
+      submit: 'Ändern',
+      more: 'Mehr'
     }
   }
 });

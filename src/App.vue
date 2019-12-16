@@ -57,10 +57,11 @@
       @option-clicked="contextMenuClicked"
     />
 
-    <div class="pa-modal" v-show="showModal" v-if="editMode">
+    <div class="pa-modal" v-show="showModal">
       <div class="pa-modal-content">
         <span class="pa-close" @click="showModal = false">&times;</span>
-        <annotation-form :container-id="containerId" v-model="formData" v-on:annotation-finished="formSubmitted()"/>
+        <annotation-form :container-id="containerId" v-model="formData" v-on:annotation-finished="formSubmitted()" v-if="editMode"/>
+        <annotation v-else v-model="formData" />
       </div>
     </div>
   </div>
@@ -68,12 +69,14 @@
 
 <script>
 import Icon from './components/Icon';
+import Annotation from './components/Annotation';
 import AnnotationForm from './components/AnnotationForm';
 import Loader from './components/Loader';
 
 export default {
   components: {
     Icon,
+    Annotation,
     AnnotationForm,
     Loader
   },
@@ -121,10 +124,8 @@ export default {
     };
   },
   mounted () {
-    if (this.editMode) {
-      document.addEventListener('keydown', this.handleKeyEvent);
-      document.addEventListener('mousedown', this.handleFocusEvent);
-    }
+    document.addEventListener('keydown', this.handleKeyEvent);
+    document.addEventListener('mousedown', this.handleFocusEvent);
 
     // set language
     if (this.language) {
@@ -135,10 +136,8 @@ export default {
     this.load();
   },
   beforeDestroy () {
-    if (this.editMode) {
-      document.removeEventListener('keydown', this.handleKeyEvent);
-      document.removeEventListener('mousedown', this.handleFocusEvent);
-    }
+    document.removeEventListener('keydown', this.handleKeyEvent);
+    document.removeEventListener('mousedown', this.handleFocusEvent);
   },
   methods: {
     // handle transformation of elements
@@ -173,7 +172,9 @@ export default {
       if (this.editMode) {
         this.updateTransformer();
       } else {
-        if (this.selectedShapeName) this.showShapeInformation(this.selectedShapeName);
+        // stop propagation - to not propagate to popup event
+        if (e && e.evt) e.evt.stopPropagation();
+        if (name) this.openAnnotation(e, name);
       }
     },
     updateTransformer () {
@@ -201,10 +202,15 @@ export default {
     },
     handleFocusEvent (e) {
       // remove focus if not clicked on element
-      if (e.target.nodeName !== 'CANVAS' || e.target !== this.$refs.items.getStage().canvas._canvas) {
+      if (this.editMode && !this.showModal && (e.target.nodeName !== 'CANVAS' || e.target !== this.$refs.items.getStage().canvas._canvas)) {
         // this is not elegant - any nicer way?
         this.selectedShapeName = '';
         this.updateTransformer();
+      }
+
+      // close modal, if clicked outside
+      if (!this.editMode && this.showModal && e && e.target && e.target.classList.contains('pa-modal')) {
+        this.showModal = false;
       }
     },
 
@@ -299,7 +305,7 @@ export default {
     // handle key events
     handleKeyEvent (event) {
       // shape selected?
-      if (this.selectedShapeName) {
+      if (this.editMode && this.selectedShapeName) {
         // delete key pressed?
         if (event.key === 'Delete') this.deleteShape(this.selectedShapeName);
       }
@@ -356,15 +362,9 @@ export default {
     handleMouseLeave () {
       this.$refs.stage.getStage().container().style.cursor = 'default';
     },
-    showShapeInformation (name) {
-      // TODO: information window
-      console.log(name); // eslint-disable-line no-console
-    },
 
     // annotation handling
     openAnnotation (event, name) {
-      if (!this.editMode) return; // edit mode only
-
       if (event && event.evt) event.evt.preventDefault();
 
       // find shape
