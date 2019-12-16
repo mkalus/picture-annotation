@@ -348,7 +348,7 @@ export default {
     },
     showShapeInformation (name) {
       // TODO: information window
-      console.log(name);
+      console.log(name); // eslint-disable-line no-console
     },
 
     // annotation handling
@@ -447,6 +447,7 @@ export default {
 <style lang="sass">
 .pa-container
   position: relative
+  overflow: hidden
 
 .pa-controls
   position: absolute

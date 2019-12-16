@@ -6,8 +6,8 @@
 
 <style lang="sass">
 .pa-loader
-  position: fixed
-  z-index: 101
+  position: absolute
+  z-index: 102
   left: 0
   top: 0
   width: 100%
