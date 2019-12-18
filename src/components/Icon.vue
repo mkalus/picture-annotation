@@ -12,7 +12,10 @@
 </template>
 
 <script>
-import { mdiShapePolygonPlus, mdiShapeSquarePlus, mdiShapeCirclePlus, mdiDeleteOutline, mdiSquareEditOutline, mdiMagnifyPlusOutline, mdiMagnifyMinusOutline } from '@mdi/js';
+import {
+  mdiShapePolygonPlus, mdiShapeSquarePlus, mdiShapeCirclePlus, mdiDeleteOutline, mdiSquareEditOutline,
+  mdiMagnifyPlusOutline, mdiMagnifyMinusOutline, mdiEyeOutline, mdiEyeOffOutline
+} from '@mdi/js';
 
 /**
  * Icon helper for SVG Icons
@@ -53,6 +56,8 @@ export default {
       switch (this.type) {
         case 'zoom-in': return mdiMagnifyPlusOutline;
         case 'zoom-out': return mdiMagnifyMinusOutline;
+        case 'shapes-on': return mdiEyeOutline;
+        case 'shapes-off': return mdiEyeOffOutline;
         case 'add-polygon': return mdiShapePolygonPlus;
         case 'add-rectangle': return mdiShapeSquarePlus;
         case 'add-circle': return mdiShapeCirclePlus;

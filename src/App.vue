@@ -1,16 +1,17 @@
 <template>
   <div :id="containerId" class="pa-container">
-    <div class="pa-controls" v-if="editMode">
+    <div class="pa-controls">
       <a href="#" @click.prevent="changeScale(0.1)" :title="$t('zoom_in')"><icon type="zoom-in" /></a>
       <a href="#" @click.prevent="changeScale(-0.1)" :title="$t('zoom_out')"><icon type="zoom-out" /></a>
       <hr />
-      <a href="#" @click.prevent="addPolygon" :title="$t('add_polygon')"><icon type="add-polygon" /></a>
-      <a href="#" @click.prevent="addRectangle" :title="$t('add_rectangle')"><icon type="add-rectangle" /></a>
-      <a href="#" @click.prevent="addCircle" :title="$t('add_circle')"><icon type="add-circle" /></a>
-      <a href="#" @click.prevent="addPerson" :title="$t('add_person')"><icon type="add-person" /></a>
-      <hr />
-      <a href="#" @click.prevent="openAnnotation(selectedShapeName)" :title="$t('open_annotation')"><icon type="edit-shape" :fill="selectedShapeName ? 'green' : 'gray'" /></a>
-      <a href="#" @click.prevent="deleteShape(selectedShapeName)" :title="$t('delete_shape')"><icon type="delete-shape" :fill="selectedShapeName ? 'red' : 'gray'" /></a>
+      <a href="#" @click.prevent="toggleShowShapes" :title="$t(isShapesVisible ? 'hide_shapes' : 'show_shapes')" v-if="!editMode"><icon :type="isShapesVisible ? 'shapes-off' : 'shapes-on'" /></a>
+      <a href="#" @click.prevent="addPolygon" :title="$t('add_polygon')" v-if="editMode"><icon type="add-polygon" /></a>
+      <a href="#" @click.prevent="addRectangle" :title="$t('add_rectangle')" v-if="editMode"><icon type="add-rectangle" /></a>
+      <a href="#" @click.prevent="addCircle" :title="$t('add_circle')" v-if="editMode"><icon type="add-circle"  /></a>
+      <a href="#" @click.prevent="addPerson" :title="$t('add_person')" v-if="editMode"><icon type="add-person" /></a>
+      <hr v-if="editMode" />
+      <a href="#" @click.prevent="openAnnotation(selectedShapeName)" :title="$t('open_annotation')" v-if="editMode"><icon type="edit-shape" :fill="selectedShapeName ? 'green' : 'gray'" /></a>
+      <a href="#" @click.prevent="deleteShape(selectedShapeName)" :title="$t('delete_shape')" v-if="editMode"><icon type="delete-shape" :fill="selectedShapeName ? 'red' : 'gray'" /></a>
     </div>
 
     <v-stage :config="{
@@ -93,6 +94,7 @@ export default {
       selectedShapeName: '', // currently selected shape
       showModal: false, // modal is shown?
       isLoading: true, // loading image?
+      isShapesVisible: true, // show shapes?
       formData: {
         title: '',
         text: '',
@@ -400,6 +402,14 @@ export default {
       };
 
       this.showModal = false;
+    },
+
+    // toggle shapes shown or not
+    toggleShowShapes () {
+      // toggle
+      this.$refs.items.getStage().canvas._canvas.style.opacity = this.isShapesVisible ? '0' : '1';
+      // TODO: fade animation
+      this.isShapesVisible = !this.isShapesVisible;
     },
 
     // open context menu handling
