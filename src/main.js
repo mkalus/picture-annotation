@@ -82,7 +82,7 @@ for (let i = 0; i < savedElements.length; i++) {
       return h(App, {
         // pass attributes of parent element to app
         props: {
-          containerId: this.$el.attributes.id || 'picture-annotation-' + Math.random(),
+          containerId: this.$el.attributes.id || 'picture-annotation-' + i,
           editMode: (this.$el.attributes['data-edit-mode'] && this.$el.attributes['data-edit-mode'].value === '1') || false,
           language: (this.$el.attributes['data-language'] && this.$el.attributes['data-language'].value) || 'en',
           imageSrc: this.$el.attributes['data-image-src'] && this.$el.attributes['data-image-src'].value,
