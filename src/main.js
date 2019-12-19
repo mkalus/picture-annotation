@@ -34,7 +34,9 @@ const i18n = new VueI18n({
       annotation_link_title: 'Link title',
       annotation_link: 'Link',
       submit: 'Change',
-      more: 'More'
+      more: 'More',
+      accept_polygon: 'Accept polyon',
+      polygon_help: 'Add points by clicking. Right click removes last point. Accept by clicking on green polygon icon.'
     },
     de: {
       zoom_in: 'Vergrößern',
@@ -54,7 +56,9 @@ const i18n = new VueI18n({
       annotation_link_title: 'Link-Titel',
       annotation_link: 'Link',
       submit: 'Ändern',
-      more: 'Mehr'
+      more: 'Mehr',
+      accept_polygon: 'Polygon annehmen',
+      polygon_help: 'Punkte durch Klicks hinzufügen. Rechtsklick entfernt den letzen Punkt. Annehmen durch Klick auf grünes Polygon-Icon.'
     }
   }
 });

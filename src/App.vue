@@ -5,7 +5,7 @@
       <a href="#" @click.prevent="changeScale(-0.1)" :title="$t('zoom_out')"><icon type="zoom-out" /></a>
       <hr />
       <a href="#" @click.prevent="toggleShowShapes" :title="$t(isShapesVisible ? 'hide_shapes' : 'show_shapes')" v-if="!editMode"><icon :type="isShapesVisible ? 'shapes-off' : 'shapes-on'" /></a>
-      <a href="#" @click.prevent="startPolygonDrawing" :title="$t('add_polygon')" v-if="editMode"><icon :type="isAddingPolygon ? 'add-polygon-accept' : 'add-polygon'" :fill="isAddingPolygon ? 'green' : 'currentColor'" /></a>
+      <a href="#" @click.prevent="startPolygonDrawing" :title="$t(isAddingPolygon ? 'accept_polygon' : 'add_polygon')" v-if="editMode"><icon :type="isAddingPolygon ? 'add-polygon-accept' : 'add-polygon'" :fill="isAddingPolygon ? 'green' : 'currentColor'" /></a>
       <a href="#" @click.prevent="addRectangle" :title="$t('add_rectangle')" v-if="editMode"><icon type="add-rectangle" :fill="isAddingPolygon ? 'gray' : 'currentColor'" /></a>
       <a href="#" @click.prevent="addCircle" :title="$t('add_circle')" v-if="editMode"><icon type="add-circle" :fill="isAddingPolygon ? 'gray' : 'currentColor'" /></a>
       <a href="#" @click.prevent="addPerson" :title="$t('add_person')" v-if="editMode"><icon type="add-person" :fill="isAddingPolygon ? 'gray' : 'currentColor'" /></a>
@@ -72,6 +72,8 @@
         <annotation v-else v-model="formData" />
       </div>
     </div>
+
+    <div class="pa-polygon-hint" v-show="isAddingPolygon">{{ $t('polygon_help') }}</div>
   </div>
 </template>
 
@@ -633,4 +635,14 @@ export default {
   color: black
   text-decoration: none
   cursor: pointer
+
+.pa-polygon-hint
+  position: absolute
+  bottom: 1em
+  left: 1em
+  background-color: rgba(0, 0, 0, 0.6)
+  color: #fff
+  padding: 0.5em
+  border-radius: 0.5em
+  font-size: 90%
 </style>
