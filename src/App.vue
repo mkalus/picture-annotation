@@ -5,10 +5,10 @@
       <a href="#" @click.prevent="changeScale(-0.1)" :title="$t('zoom_out')"><icon type="zoom-out" /></a>
       <hr />
       <a href="#" @click.prevent="toggleShowShapes" :title="$t(isShapesVisible ? 'hide_shapes' : 'show_shapes')" v-if="!editMode"><icon :type="isShapesVisible ? 'shapes-off' : 'shapes-on'" /></a>
-      <a href="#" @click.prevent="addPolygon" :title="$t('add_polygon')" v-if="editMode"><icon type="add-polygon" /></a>
-      <a href="#" @click.prevent="addRectangle" :title="$t('add_rectangle')" v-if="editMode"><icon type="add-rectangle" /></a>
-      <a href="#" @click.prevent="addCircle" :title="$t('add_circle')" v-if="editMode"><icon type="add-circle"  /></a>
-      <a href="#" @click.prevent="addPerson" :title="$t('add_person')" v-if="editMode"><icon type="add-person" /></a>
+      <a href="#" @click.prevent="startPolygonDrawing" :title="$t('add_polygon')" v-if="editMode"><icon :type="isAddingPolygon ? 'add-polygon-accept' : 'add-polygon'" :fill="isAddingPolygon ? 'green' : 'currentColor'" /></a>
+      <a href="#" @click.prevent="addRectangle" :title="$t('add_rectangle')" v-if="editMode"><icon type="add-rectangle" :fill="isAddingPolygon ? 'gray' : 'currentColor'" /></a>
+      <a href="#" @click.prevent="addCircle" :title="$t('add_circle')" v-if="editMode"><icon type="add-circle" :fill="isAddingPolygon ? 'gray' : 'currentColor'" /></a>
+      <a href="#" @click.prevent="addPerson" :title="$t('add_person')" v-if="editMode"><icon type="add-person" :fill="isAddingPolygon ? 'gray' : 'currentColor'" /></a>
       <hr v-if="editMode" />
       <a href="#" @click.prevent="openAnnotation(selectedShapeName)" :title="$t('open_annotation')" v-if="editMode"><icon type="edit-shape" :fill="selectedShapeName ? 'green' : 'gray'" /></a>
       <a href="#" @click.prevent="deleteShape(selectedShapeName)" :title="$t('delete_shape')" v-if="editMode"><icon type="delete-shape" :fill="selectedShapeName ? 'red' : 'gray'" /></a>
@@ -20,7 +20,7 @@
       scaleX: scale,
       scaleY: scale,
       draggable: true
-    }" @mousedown="handleStageMouseDown" @wheel="handleScroll" :ref="'stage'">
+    }" @mousedown="handleStageMouseDown" @mouseenter="handleGlobalMouseEnter" @mouseleave="handleGlobalMouseLeave" @wheel="handleScroll" :ref="'stage'">
       <v-layer ref="background">
         <v-image :config="{
             image: image
@@ -46,6 +46,12 @@
                   @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave"/>
         </template>
         <v-transformer ref="transformer" v-if="editMode"/>
+      </v-layer>
+      <v-layer ref="polygon" v-if="editMode && isAddingPolygon">
+        <v-line v-if="polygonPoints.length > 2" :config="polygonPointsConfig" />
+        <template v-for="(shape, index) in polygonAddShapes">
+          <v-rect :config="shape" :key="index" />
+        </template>
       </v-layer>
     </v-stage>
 
@@ -95,6 +101,9 @@ export default {
       showModal: false, // modal is shown?
       isLoading: true, // loading image?
       isShapesVisible: true, // show shapes?
+      isAddingPolygon: false, // currently in polygon add mode?
+      polygonPoints: [],
+      polygonAddShapes: [],
       formData: {
         title: '',
         text: '',
@@ -102,6 +111,15 @@ export default {
         link: ''
       }
     };
+  },
+  computed: {
+    polygonPointsConfig () {
+      return {
+        points: this.polygonPoints,
+        ...this.getBaseShapeForPolygon(),
+        closed: true
+      };
+    }
   },
   // created live cycle hook
   created () {
@@ -144,6 +162,16 @@ export default {
   methods: {
     // handle transformation of elements
     handleStageMouseDown (e) {
+      // only handle left mouse button
+      if (e.evt && e.evt.button !== 0) return;
+
+      // adding polygon shape?
+      if (this.isAddingPolygon) {
+        this.addPolygonPoint();
+        return; // no further stuff
+      }
+
+      // in edit mode?
       if (this.editMode) {
         // edit mode only
 
@@ -217,19 +245,65 @@ export default {
     },
 
     // handle additions
-    addPolygon () {
+    startPolygonDrawing () {
+      // actually drawing polygon right now?
+      if (this.isAddingPolygon) {
+        // clear list and copy
+        const points = this.polygonPoints.splice(0, this.polygonPoints.length);
+
+        // if polygon has 3 or more points, accept it
+        if (points.length > 5) {
+          this.addPolygon(points);
+        }
+
+        // clear points
+        if (this.polygonAddShapes.length) {
+          this.polygonAddShapes.splice(0, this.polygonAddShapes.length);
+        }
+
+        this.isAddingPolygon = false;
+      } else {
+        this.isAddingPolygon = true;
+      }
+    },
+    addPolygonPoint () { // add single polygon point
+      // get stage and calculate pointer
+      const stage = this.$refs.stage.getStage();
+      const pointerPosition = stage.getPointerPosition();
+      const x = (pointerPosition.x - (stage.attrs.x || 0)) / stage.attrs.scaleX;
+      const y = (pointerPosition.y - (stage.attrs.y || 0)) / stage.attrs.scaleY;
+
+      // add to list of points
+      this.polygonPoints.push(x, y);
+
+      // add new rect
+      this.polygonAddShapes.push({
+        ...this.getBaseShapeForPolygon(),
+        x: x - 15,
+        y: y - 15,
+        width: 30,
+        height: 30
+      });
+    },
+    removePolygonPoint () { // remove single polygon point
+      // TODO
+    },
+
+    addPolygon (points) {
       this.shapes.push({
         ...this.getBaseShape('poly'),
-        points: [23, 20, 23, 160, 70, 93, 150, 109, 290, 139, 270, 93], // TODO: addPoly Layer + Function
+        points: points,
         closed: true,
-        x: 180,
-        y: 150
+        x: 0,
+        y: 0
       });
 
       // call update
       this.shapesUpdated();
     },
     addRectangle () {
+      if (this.isAddingPolygon) return;
+
       this.shapes.push({
         ...this.getBaseShape('rect'),
         x: 80 / this.scale,
@@ -242,6 +316,8 @@ export default {
       this.shapesUpdated();
     },
     addCircle () {
+      if (this.isAddingPolygon) return;
+
       this.shapes.push({
         ...this.getBaseShape('circle'),
         x: 180 / this.scale,
@@ -254,6 +330,8 @@ export default {
     },
 
     addPerson () {
+      if (this.isAddingPolygon) return;
+
       this.shapes.push({
         ...this.getBaseShape('path'),
         x: 80 / this.scale,
@@ -273,9 +351,9 @@ export default {
       return {
         type: type,
         name: 'shape-' + (new Date()).valueOf(),
-        fill: 'lightsteelblue',
+        fill: '#b0c4de',
         opacity: 0.5,
-        stroke: 'blue',
+        stroke: '#0000ff',
         draggable: true,
         strokeWidth: 2,
         strokeScaleEnabled: false,
@@ -285,6 +363,16 @@ export default {
           linkTitle: '',
           link: ''
         }
+      };
+    },
+    getBaseShapeForPolygon (type) {
+      return {
+        fill: '#a24545',
+        opacity: 0.5,
+        stroke: '#800000',
+        // draggable: true, // TODO
+        strokeWidth: 2,
+        strokeScaleEnabled: false
       };
     },
 
@@ -359,10 +447,16 @@ export default {
 
     // handle show stuff
     handleMouseEnter () {
-      this.$refs.stage.getStage().container().style.cursor = 'pointer';
+      if (!this.isAddingPolygon) this.$refs.stage.getStage().container().style.cursor = 'pointer';
     },
     handleMouseLeave () {
-      this.$refs.stage.getStage().container().style.cursor = 'default';
+      if (!this.isAddingPolygon) this.$refs.stage.getStage().container().style.cursor = 'default';
+    },
+    handleGlobalMouseEnter () {
+      if (this.isAddingPolygon) this.$refs.stage.getStage().container().style.cursor = 'crosshair';
+    },
+    handleGlobalMouseLeave () {
+      if (this.isAddingPolygon) this.$refs.stage.getStage().container().style.cursor = 'default';
     },
 
     // annotation handling
