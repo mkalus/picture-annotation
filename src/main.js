@@ -66,7 +66,9 @@ const i18n = new VueI18n({
 // loading wrapper for each instance
 const $elements = document.getElementsByClassName('picture-annotation');
 const savedElements = []; // save elements to array, since array will otherwise be reduce while looping
-$elements.forEach($el => savedElements.push($el));
+for (let i = 0; i < $elements.length; i++) {
+  savedElements.push($elements[i]);
+}
 
 for (let i = 0; i < savedElements.length; i++) {
   const $el = savedElements[i];
