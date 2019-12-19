@@ -171,8 +171,6 @@ export default {
         e.evt.stopPropagation();
         e.evt.stopImmediatePropagation();
 
-        console.log(e.evt);
-
         // right mouse button deletes last point
         if (e.evt.button === 2) this.removePolygonPoint();
         else if (e.evt.detail === 1) this.addPolygonPoint(); // ignore double clicks
