@@ -25,5 +25,4 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 
 
 TODOs:
-* Polygone - after rotate bug
 * delete points?

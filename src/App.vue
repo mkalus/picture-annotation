@@ -440,6 +440,8 @@ export default {
       shape.rotation = event.currentTarget.attrs.rotation;
       shape.scaleX = event.currentTarget.attrs.scaleX;
       shape.scaleY = event.currentTarget.attrs.scaleY;
+      shape.x = event.currentTarget.attrs.x;
+      shape.y = event.currentTarget.attrs.y;
 
       // call update
       this.shapesUpdated();
