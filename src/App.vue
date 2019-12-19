@@ -20,7 +20,8 @@
       scaleX: scale,
       scaleY: scale,
       draggable: true
-    }" @mousedown="handleStageMouseDown" @mouseenter="handleGlobalMouseEnter" @mouseleave="handleGlobalMouseLeave" @wheel="handleScroll" :ref="'stage'">
+    }" @mousedown="handleStageMouseDown" @contextmenu="cancelEvent"
+       @mouseenter="handleGlobalMouseEnter" @mouseleave="handleGlobalMouseLeave" @wheel="handleScroll" :ref="'stage'">
       <v-layer ref="background">
         <v-image :config="{
             image: image
@@ -162,14 +163,23 @@ export default {
   methods: {
     // handle transformation of elements
     handleStageMouseDown (e) {
-      // only handle left mouse button
-      if (e.evt && e.evt.button !== 0) return;
-
       // adding polygon shape?
       if (this.isAddingPolygon) {
-        this.addPolygonPoint();
+        e.evt.preventDefault();
+        e.evt.stopPropagation();
+        e.evt.stopImmediatePropagation();
+
+        console.log(e.evt);
+
+        // right mouse button deletes last point
+        if (e.evt.button === 2) this.removePolygonPoint();
+        else if (e.evt.detail === 1) this.addPolygonPoint(); // ignore double clicks
+
         return; // no further stuff
       }
+
+      // only handle left mouse button
+      if (e.evt && e.evt.button !== 0) return;
 
       // in edit mode?
       if (this.editMode) {
@@ -243,25 +253,15 @@ export default {
         this.showModal = false;
       }
     },
+    cancelEvent (e) {
+      e.evt.preventDefault();
+    },
 
     // handle additions
     startPolygonDrawing () {
       // actually drawing polygon right now?
       if (this.isAddingPolygon) {
-        // clear list and copy
-        const points = this.polygonPoints.splice(0, this.polygonPoints.length);
-
-        // if polygon has 3 or more points, accept it
-        if (points.length > 5) {
-          this.addPolygon(points);
-        }
-
-        // clear points
-        if (this.polygonAddShapes.length) {
-          this.polygonAddShapes.splice(0, this.polygonAddShapes.length);
-        }
-
-        this.isAddingPolygon = false;
+        this.finishPolygon();
       } else {
         this.isAddingPolygon = true;
       }
@@ -286,7 +286,29 @@ export default {
       });
     },
     removePolygonPoint () { // remove single polygon point
-      // TODO
+      if (this.polygonPoints.length) {
+        // remove last two points from list
+        this.polygonPoints.splice(this.polygonPoints.length - 2, 2);
+
+        // slice last shape off
+        this.polygonAddShapes.pop();
+      }
+    },
+    finishPolygon () {
+      // clear list and copy
+      const points = this.polygonPoints.splice(0, this.polygonPoints.length);
+
+      // if polygon has 3 or more points, accept it
+      if (points.length > 5) {
+        this.addPolygon(points);
+      }
+
+      // clear points
+      if (this.polygonAddShapes.length) {
+        this.polygonAddShapes.splice(0, this.polygonAddShapes.length);
+      }
+
+      this.isAddingPolygon = false;
     },
 
     addPolygon (points) {
@@ -370,7 +392,6 @@ export default {
         fill: '#a24545',
         opacity: 0.5,
         stroke: '#800000',
-        // draggable: true, // TODO
         strokeWidth: 2,
         strokeScaleEnabled: false
       };
