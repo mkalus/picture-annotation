@@ -1,6 +1,6 @@
 <template>
-  <div class="pa-container">
-    <div :id="containerId" class="pa-canvas">
+  <div :id="containerId" class="pa-container" :style="{width: width + 'px', height: height + 'px'}">
+    <div class="pa-canvas">
       <div class="pa-controls">
         <a href="#" @click.prevent="changeScale(0.1)" :title="$t('zoom_in')"><icon type="zoom-in" /></a>
         <a href="#" @click.prevent="changeScale(-0.1)" :title="$t('zoom_out')"><icon type="zoom-out" /></a>
@@ -11,9 +11,10 @@
         <a href="#" @click.prevent="addCircle" :title="$t('add_circle')" v-if="editMode"><icon type="add-circle" :fill="isAddingPolygon ? 'gray' : 'currentColor'" /></a>
         <a href="#" @click.prevent="addPerson" :title="$t('add_person')" v-if="editMode"><icon type="add-person" :fill="isAddingPolygon ? 'gray' : 'currentColor'" /></a>
         <hr v-if="editMode" />
-        <a href="#" @click.prevent="openAnnotation(selectedShapeName)" :title="$t('open_annotation')" v-if="editMode"><icon type="edit-shape" :fill="selectedShapeName ? 'green' : 'gray'" /></a>
-        <a href="#" @click.prevent="deleteShape(selectedShapeName)" :title="$t('delete_shape')" v-if="editMode"><icon type="delete-shape" :fill="selectedShapeName ? 'red' : 'gray'" /></a>
+        <a href="#" @click.prevent="openAnnotation" :title="$t('open_annotation')" v-if="editMode"><icon type="edit-shape" :fill="selectedShapeName ? 'green' : 'gray'" /></a>
+        <a href="#" @click.prevent="deleteShape" :title="$t('delete_shape')" v-if="editMode"><icon type="delete-shape" :fill="selectedShapeName ? 'red' : 'gray'" /></a>
       </div>
+      <!-- TODO: Fix buttons above - unselect triggers before button can get selectedShapeName -->
 
       <v-stage :config="{
         width: stageSize.width,
@@ -77,7 +78,9 @@
       <div class="pa-polygon-hint" v-show="isAddingPolygon">{{ $t('polygon_help') }}</div>
     </div>
     <div class="pa-infobar">
-      INFO
+      <div v-for="shape in shapes" :key="shape.name">
+        {{shape.name}}
+      </div>
     </div>
   </div>
 </template>
@@ -147,7 +150,7 @@ export default {
   // created live cycle hook
   created () {
     // set defaults
-    this.stageSize.width = parseInt(this.width);
+    this.stageSize.width = parseInt(this.width) / 3 * 2 - 2; // - 2 for border
     this.stageSize.height = parseInt(this.height);
 
     if (!this.stageSize.width || isNaN(this.stageSize.width)) this.stageSize.width = window.innerWidth;
@@ -510,6 +513,7 @@ export default {
     // annotation handling
     openAnnotation (event, name) {
       if (event && event.evt) event.evt.preventDefault();
+      if (!name) name = this.selectedShapeName;
 
       // find shape
       const idx = this.shapes.findIndex(r => r.name === name);
@@ -608,9 +612,9 @@ export default {
 
 <style lang="sass">
 .pa-container
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif
   display: grid
   grid-template-columns: 2fr 1fr
-  grid-gap: 10px
 
 .pa-canvas
   border: 1px solid #ccc
@@ -674,4 +678,7 @@ export default {
   padding: 0.5em
   border-radius: 0.5em
   font-size: 90%
+
+.pa-infobar
+  margin-left: 5px
 </style>
