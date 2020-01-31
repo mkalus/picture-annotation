@@ -1,22 +1,5 @@
-<template>
-  <app />
-</template>
-
-<script>
-import Vue from 'vue';
-import VueKonva from 'vue-konva';
-import 'vue-simple-context-menu/dist/vue-simple-context-menu.css';
-import VueSimpleContextMenu from 'vue-simple-context-menu';
-import VueI18n from 'vue-i18n';
-import App from './App';
-
-Vue.config.productionTip = false;
-
-Vue.use(VueKonva);
-Vue.component('vue-simple-context-menu', VueSimpleContextMenu);
-
-// Create VueI18n instance with options
-const i18n = new VueI18n({
+// i18n options
+export default {
   locale: 'en',
   fallbackLocale: 'en',
   messages: {
@@ -65,13 +48,4 @@ const i18n = new VueI18n({
       polygon_help: 'Punkte durch Klicks hinzufügen. Rechtsklick entfernt den letzen Punkt. Annehmen durch Klick auf grünes Polygon-Icon.'
     }
   }
-});
-Vue.use(VueI18n);
-
-export default {
-  components: {
-    App
-  },
-  i18n: i18n
 };
-</script>

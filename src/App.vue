@@ -78,10 +78,23 @@
 </template>
 
 <script>
+import Vue from 'vue';
+import VueKonva from 'vue-konva';
+import 'vue-simple-context-menu/dist/vue-simple-context-menu.css';
+import VueSimpleContextMenu from 'vue-simple-context-menu';
+import VueI18n from 'vue-i18n';
+import i18n from './i18n.js';
 import Icon from './components/Icon';
 import Annotation from './components/Annotation';
 import AnnotationForm from './components/AnnotationForm';
 import Loader from './components/Loader';
+
+// some Vue use definitions - Konva painting, context menu component, i18n
+Vue.use(VueKonva);
+Vue.component('vue-simple-context-menu', VueSimpleContextMenu);
+Vue.use(VueI18n);
+
+Vue.config.productionTip = false;
 
 export default {
   components: {
@@ -91,6 +104,7 @@ export default {
     Loader
   },
   props: ['language', 'containerId', 'imageSrc', 'dataCallback', 'localStorageKey', 'width', 'height', 'editMode', 'initialData'],
+  i18n: new VueI18n(i18n),
   data () {
     return {
       image: null,
@@ -126,6 +140,13 @@ export default {
   },
   // created live cycle hook
   created () {
+    /*// define callback TODO
+    const callback = this.dataCallback &&
+      typeof eval(this.dataCallback) && // eslint-disable-line no-eval
+      eval(this.dataCallback); // eslint-disable-line no-eval
+
+    console.log(callback);*/
+
     // set defaults
     this.stageSize.width = parseInt(this.width);
     this.stageSize.height = parseInt(this.height);

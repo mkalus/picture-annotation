@@ -1,75 +1,14 @@
 import Vue from 'vue';
-import VueKonva from 'vue-konva';
 import App from './App.vue';
-import 'vue-simple-context-menu/dist/vue-simple-context-menu.css';
-import VueSimpleContextMenu from 'vue-simple-context-menu';
-import VueI18n from 'vue-i18n';
 
-Vue.config.productionTip = false;
-
-Vue.use(VueKonva);
-Vue.component('vue-simple-context-menu', VueSimpleContextMenu);
-Vue.use(VueI18n);
-
-// Create VueI18n instance with options
-const i18n = new VueI18n({
-  locale: 'en',
-  fallbackLocale: 'en',
-  messages: {
-    en: {
-      zoom_in: 'Zoom in',
-      zoom_out: 'Zoom out',
-      add_polygon: 'Add polygon',
-      add_rectangle: 'Add rectangle',
-      add_circle: 'Add circle',
-      add_person: 'Add person shape',
-      open_annotation: 'Annotate shape',
-      delete_shape: 'Delete shape',
-      hide_shapes: 'Hide shapes',
-      show_shapes: 'Show shapes',
-      edit: 'Annotate',
-      delete: 'Delete',
-      annotation_title: 'Title',
-      annotation_text: 'Text',
-      annotation_link_title: 'Link title',
-      annotation_link: 'Link',
-      submit: 'Change',
-      more: 'More',
-      accept_polygon: 'Accept polyon',
-      polygon_help: 'Add points by clicking. Right click removes last point. Accept by clicking on green polygon icon.'
-    },
-    de: {
-      zoom_in: 'Vergrößern',
-      zoom_out: 'Verkleinern',
-      add_polygon: 'Polygon hinzufügen',
-      add_rectangle: 'Rechteck hinzufügen',
-      add_circle: 'Kreis hinzufügen',
-      add_person: 'Personenform hinzufügen',
-      open_annotation: 'Daten eingeben',
-      delete_shape: 'Löschen',
-      hide_shapes: 'Annotationen verbergen',
-      show_shapes: 'Annotationen zeigen',
-      edit: 'Daten',
-      delete: 'Löschen',
-      annotation_title: 'Titel',
-      annotation_text: 'Text',
-      annotation_link_title: 'Link-Titel',
-      annotation_link: 'Link',
-      submit: 'Ändern',
-      more: 'Mehr',
-      accept_polygon: 'Polygon annehmen',
-      polygon_help: 'Punkte durch Klicks hinzufügen. Rechtsklick entfernt den letzen Punkt. Annehmen durch Klick auf grünes Polygon-Icon.'
-    }
-  }
-});
-
-// loading wrapper for each instance
+// loader that simulates the parameters of the web component
 const $elements = document.getElementsByClassName('picture-annotation');
 const savedElements = []; // save elements to array, since array will otherwise be reduce while looping
 for (let i = 0; i < $elements.length; i++) {
   savedElements.push($elements[i]);
 }
 
+// retrieve elements from array and create vue instances
 for (let i = 0; i < savedElements.length; i++) {
   const $el = savedElements[i];
 
@@ -78,17 +17,18 @@ for (let i = 0; i < savedElements.length; i++) {
 
   // create new instance for each occurrence
   new Vue({
-    i18n,
+    // handler for rendering component
     render: function (h) {
       const callback = this.$el.attributes['data-callback'] &&
         this.$el.attributes['data-callback'].value &&
         typeof eval(this.$el.attributes['data-callback'].value) && // eslint-disable-line no-eval
         eval(this.$el.attributes['data-callback'].value); // eslint-disable-line no-eval
 
+      // return App instance with parameters
       return h(App, {
         // pass attributes of parent element to app
         props: {
-          containerId: this.$el.attributes.id || 'picture-annotation-' + i,
+          containerId: (this.$el.attributes.id && this.$el.attributes.id.value) || 'picture-annotation-' + i,
           editMode: (this.$el.attributes['data-edit-mode'] && this.$el.attributes['data-edit-mode'].value === '1') || false,
           language: (this.$el.attributes['data-language'] && this.$el.attributes['data-language'].value) || 'en',
           imageSrc: this.$el.attributes['data-image-src'] && this.$el.attributes['data-image-src'].value,

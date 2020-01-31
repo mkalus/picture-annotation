@@ -5,7 +5,7 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "build-wc": "vue-cli-service build --target wc --name lw-picture-annotation src/WebComponent.vue",
+    "build:wc": "vue-cli-service build --target wc --name lw-picture-annotation src/App.vue",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
