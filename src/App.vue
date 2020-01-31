@@ -1,79 +1,84 @@
 <template>
-  <div :id="containerId" class="pa-container">
-    <div class="pa-controls">
-      <a href="#" @click.prevent="changeScale(0.1)" :title="$t('zoom_in')"><icon type="zoom-in" /></a>
-      <a href="#" @click.prevent="changeScale(-0.1)" :title="$t('zoom_out')"><icon type="zoom-out" /></a>
-      <hr />
-      <a href="#" @click.prevent="toggleShowShapes" :title="$t(isShapesVisible ? 'hide_shapes' : 'show_shapes')" v-if="!editMode"><icon :type="isShapesVisible ? 'shapes-off' : 'shapes-on'" /></a>
-      <a href="#" @click.prevent="startPolygonDrawing" :title="$t(isAddingPolygon ? 'accept_polygon' : 'add_polygon')" v-if="editMode"><icon :type="isAddingPolygon ? 'add-polygon-accept' : 'add-polygon'" :fill="isAddingPolygon ? 'green' : 'currentColor'" /></a>
-      <a href="#" @click.prevent="addRectangle" :title="$t('add_rectangle')" v-if="editMode"><icon type="add-rectangle" :fill="isAddingPolygon ? 'gray' : 'currentColor'" /></a>
-      <a href="#" @click.prevent="addCircle" :title="$t('add_circle')" v-if="editMode"><icon type="add-circle" :fill="isAddingPolygon ? 'gray' : 'currentColor'" /></a>
-      <a href="#" @click.prevent="addPerson" :title="$t('add_person')" v-if="editMode"><icon type="add-person" :fill="isAddingPolygon ? 'gray' : 'currentColor'" /></a>
-      <hr v-if="editMode" />
-      <a href="#" @click.prevent="openAnnotation(selectedShapeName)" :title="$t('open_annotation')" v-if="editMode"><icon type="edit-shape" :fill="selectedShapeName ? 'green' : 'gray'" /></a>
-      <a href="#" @click.prevent="deleteShape(selectedShapeName)" :title="$t('delete_shape')" v-if="editMode"><icon type="delete-shape" :fill="selectedShapeName ? 'red' : 'gray'" /></a>
-    </div>
+  <div class="pa-container">
+    <div :id="containerId" class="pa-canvas">
+      <div class="pa-controls">
+        <a href="#" @click.prevent="changeScale(0.1)" :title="$t('zoom_in')"><icon type="zoom-in" /></a>
+        <a href="#" @click.prevent="changeScale(-0.1)" :title="$t('zoom_out')"><icon type="zoom-out" /></a>
+        <hr />
+        <a href="#" @click.prevent="toggleShowShapes" :title="$t(isShapesVisible ? 'hide_shapes' : 'show_shapes')" v-if="!editMode"><icon :type="isShapesVisible ? 'shapes-off' : 'shapes-on'" /></a>
+        <a href="#" @click.prevent="startPolygonDrawing" :title="$t(isAddingPolygon ? 'accept_polygon' : 'add_polygon')" v-if="editMode"><icon :type="isAddingPolygon ? 'add-polygon-accept' : 'add-polygon'" :fill="isAddingPolygon ? 'green' : 'currentColor'" /></a>
+        <a href="#" @click.prevent="addRectangle" :title="$t('add_rectangle')" v-if="editMode"><icon type="add-rectangle" :fill="isAddingPolygon ? 'gray' : 'currentColor'" /></a>
+        <a href="#" @click.prevent="addCircle" :title="$t('add_circle')" v-if="editMode"><icon type="add-circle" :fill="isAddingPolygon ? 'gray' : 'currentColor'" /></a>
+        <a href="#" @click.prevent="addPerson" :title="$t('add_person')" v-if="editMode"><icon type="add-person" :fill="isAddingPolygon ? 'gray' : 'currentColor'" /></a>
+        <hr v-if="editMode" />
+        <a href="#" @click.prevent="openAnnotation(selectedShapeName)" :title="$t('open_annotation')" v-if="editMode"><icon type="edit-shape" :fill="selectedShapeName ? 'green' : 'gray'" /></a>
+        <a href="#" @click.prevent="deleteShape(selectedShapeName)" :title="$t('delete_shape')" v-if="editMode"><icon type="delete-shape" :fill="selectedShapeName ? 'red' : 'gray'" /></a>
+      </div>
 
-    <v-stage :config="{
-      width: stageSize.width,
-      height: stageSize.height,
-      scaleX: scale,
-      scaleY: scale,
-      draggable: true
-    }" @mousedown="handleStageMouseDown" @contextmenu="cancelEvent"
-       @mouseenter="handleGlobalMouseEnter" @mouseleave="handleGlobalMouseLeave" @wheel="handleScroll" :ref="'stage'">
-      <v-layer ref="background">
-        <v-image :config="{
-            image: image
-          }" />
-      </v-layer>
-      <v-layer ref="items">
-        <template v-for="shape in shapes">
-          <v-rect v-if="shape.type === 'rect'" :config="shape" :key="shape.name"
-                  @dblclick="openAnnotation($event, shape.name)" @contextmenu="openContextMenu($event, shape.name)"
-                  @dragend="handleDragEnd($event, shape)" @transformend="handleTransform($event, shape)"
-                  @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave"/>
-          <v-circle v-if="shape.type === 'circle'" :config="shape" :key="shape.name"
+      <v-stage :config="{
+        width: stageSize.width,
+        height: stageSize.height,
+        scaleX: scale,
+        scaleY: scale,
+        draggable: true
+      }" @mousedown="handleStageMouseDown" @contextmenu="cancelEvent"
+         @mouseenter="handleGlobalMouseEnter" @mouseleave="handleGlobalMouseLeave" @wheel="handleScroll" :ref="'stage'">
+        <v-layer ref="background">
+          <v-image :config="{
+              image: image
+            }" />
+        </v-layer>
+        <v-layer ref="items">
+          <template v-for="shape in shapes">
+            <v-rect v-if="shape.type === 'rect'" :config="shape" :key="shape.name"
                     @dblclick="openAnnotation($event, shape.name)" @contextmenu="openContextMenu($event, shape.name)"
                     @dragend="handleDragEnd($event, shape)" @transformend="handleTransform($event, shape)"
                     @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave"/>
-          <v-line v-if="shape.type === 'poly'" :config="shape" :key="shape.name"
-                  @dblclick="openAnnotation($event, shape.name)" @contextmenu="openContextMenu($event, shape.name)"
-                  @dragend="handleDragEnd($event, shape)" @transformend="handleTransform($event, shape)"
-                  @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave"/>
-          <v-path v-if="shape.type === 'path'" :config="shape" :key="shape.name"
-                  @dblclick="openAnnotation($event, shape.name)" @contextmenu="openContextMenu($event, shape.name)"
-                  @dragend="handleDragEnd($event, shape)" @transformend="handleTransform($event, shape)"
-                  @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave"/>
-        </template>
-        <v-transformer ref="transformer" v-if="editMode"/>
-      </v-layer>
-      <v-layer ref="polygon" v-if="editMode && isAddingPolygon">
-        <v-line v-if="polygonPoints.length > 2" :config="polygonPointsConfig" />
-        <template v-for="(shape, index) in polygonAddShapes">
-          <v-rect :config="shape" :key="index" />
-        </template>
-      </v-layer>
-    </v-stage>
+            <v-circle v-if="shape.type === 'circle'" :config="shape" :key="shape.name"
+                      @dblclick="openAnnotation($event, shape.name)" @contextmenu="openContextMenu($event, shape.name)"
+                      @dragend="handleDragEnd($event, shape)" @transformend="handleTransform($event, shape)"
+                      @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave"/>
+            <v-line v-if="shape.type === 'poly'" :config="shape" :key="shape.name"
+                    @dblclick="openAnnotation($event, shape.name)" @contextmenu="openContextMenu($event, shape.name)"
+                    @dragend="handleDragEnd($event, shape)" @transformend="handleTransform($event, shape)"
+                    @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave"/>
+            <v-path v-if="shape.type === 'path'" :config="shape" :key="shape.name"
+                    @dblclick="openAnnotation($event, shape.name)" @contextmenu="openContextMenu($event, shape.name)"
+                    @dragend="handleDragEnd($event, shape)" @transformend="handleTransform($event, shape)"
+                    @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave"/>
+          </template>
+          <v-transformer ref="transformer" v-if="editMode"/>
+        </v-layer>
+        <v-layer ref="polygon" v-if="editMode && isAddingPolygon">
+          <v-line v-if="polygonPoints.length > 2" :config="polygonPointsConfig" />
+          <template v-for="(shape, index) in polygonAddShapes">
+            <v-rect :config="shape" :key="index" />
+          </template>
+        </v-layer>
+      </v-stage>
 
-    <loader v-if="isLoading" />
+      <loader v-if="isLoading" />
 
-    <vue-simple-context-menu
-      :elementId="containerId + '-ctx-menu'"
-      :options="[{name: $t('edit'), action: 'edit'}, {name: $t('delete'), action: 'delete'}]"
-      :ref="'vueSimpleContextMenu'"
-      @option-clicked="contextMenuClicked"
-    />
+      <vue-simple-context-menu
+        :elementId="containerId + '-ctx-menu'"
+        :options="[{name: $t('edit'), action: 'edit'}, {name: $t('delete'), action: 'delete'}]"
+        :ref="'vueSimpleContextMenu'"
+        @option-clicked="contextMenuClicked"
+      />
 
-    <div class="pa-modal" v-show="showModal">
-      <div class="pa-modal-content">
-        <span class="pa-close" @click="showModal = false">&times;</span>
-        <annotation-form :container-id="containerId" v-model="formData" v-on:annotation-finished="formSubmitted()" v-if="editMode"/>
-        <annotation v-else v-model="formData" />
+      <div class="pa-modal" v-show="showModal">
+        <div class="pa-modal-content">
+          <span class="pa-close" @click="showModal = false">&times;</span>
+          <annotation-form :container-id="containerId" v-model="formData" v-on:annotation-finished="formSubmitted()" v-if="editMode"/>
+          <annotation v-else v-model="formData" />
+        </div>
       </div>
-    </div>
 
-    <div class="pa-polygon-hint" v-show="isAddingPolygon">{{ $t('polygon_help') }}</div>
+      <div class="pa-polygon-hint" v-show="isAddingPolygon">{{ $t('polygon_help') }}</div>
+    </div>
+    <div class="pa-infobar">
+      INFO
+    </div>
   </div>
 </template>
 
@@ -603,6 +608,12 @@ export default {
 
 <style lang="sass">
 .pa-container
+  display: grid
+  grid-template-columns: 2fr 1fr
+  grid-gap: 10px
+
+.pa-canvas
+  border: 1px solid #ccc
   position: relative
   overflow: hidden
 
