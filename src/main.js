@@ -19,11 +19,6 @@ for (let i = 0; i < savedElements.length; i++) {
   new Vue({
     // handler for rendering component
     render: function (h) {
-      const callback = this.$el.attributes['data-callback'] &&
-        this.$el.attributes['data-callback'].value &&
-        typeof eval(this.$el.attributes['data-callback'].value) && // eslint-disable-line no-eval
-        eval(this.$el.attributes['data-callback'].value); // eslint-disable-line no-eval
-
       // return App instance with parameters
       return h(App, {
         // pass attributes of parent element to app
@@ -35,7 +30,7 @@ for (let i = 0; i < savedElements.length; i++) {
           localStorageKey: this.$el.attributes['data-local-storage-key'] && this.$el.attributes['data-local-storage-key'].value,
           width: (this.$el.attributes['data-width'] && this.$el.attributes['data-width'].value) || $el.innerWidth,
           height: (this.$el.attributes['data-height'] && this.$el.attributes['data-height'].value) || $el.innerHeight,
-          dataCallback: callback,
+          dataCallback: this.$el.attributes['data-callback'] && this.$el.attributes['data-callback'].value,
           initialData: (data.length && data[0].innerHTML) || ''
         }
       });

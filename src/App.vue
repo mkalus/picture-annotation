@@ -121,6 +121,7 @@ export default {
       isAddingPolygon: false, // currently in polygon add mode?
       polygonPoints: [],
       polygonAddShapes: [],
+      callback: undefined, // actual callback function
       formData: {
         title: '',
         text: '',
@@ -140,13 +141,6 @@ export default {
   },
   // created live cycle hook
   created () {
-    /*// define callback TODO
-    const callback = this.dataCallback &&
-      typeof eval(this.dataCallback) && // eslint-disable-line no-eval
-      eval(this.dataCallback); // eslint-disable-line no-eval
-
-    console.log(callback);*/
-
     // set defaults
     this.stageSize.width = parseInt(this.width);
     this.stageSize.height = parseInt(this.height);
@@ -166,6 +160,11 @@ export default {
       // loading finished
       this.isLoading = false;
     };
+
+    // define callback function
+    this.callback = this.dataCallback &&
+      typeof eval(this.dataCallback) && // eslint-disable-line no-eval
+      eval(this.dataCallback); // eslint-disable-line no-eval
   },
   mounted () {
     document.addEventListener('keydown', this.handleKeyEvent);
@@ -576,8 +575,8 @@ export default {
 
     // callback on update
     shapesUpdated () {
-      if (this.dataCallback && typeof this.dataCallback === 'function') {
-        this.dataCallback(JSON.stringify(this.shapes));
+      if (this.callback && typeof this.callback === 'function') {
+        this.callback(JSON.stringify(this.shapes));
       }
 
       // save to local storage, if defined
