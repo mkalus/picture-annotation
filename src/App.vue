@@ -34,19 +34,19 @@
             <v-rect v-if="shape.type === 'rect'" :config="shape" :key="shape.name"
                     @dblclick="openAnnotation($event, shape.name)"
                     @dragend="handleDragEnd($event, shape)" @transformend="handleTransform($event, shape)"
-                    @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave"/>
+                    @mouseenter="handleMouseEnter(shape.name)" @mouseleave="handleMouseLeave"/>
             <v-circle v-if="shape.type === 'circle'" :config="shape" :key="shape.name"
                       @dblclick="openAnnotation($event, shape.name)"
                       @dragend="handleDragEnd($event, shape)" @transformend="handleTransform($event, shape)"
-                      @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave"/>
+                      @mouseenter="handleMouseEnter(shape.name)" @mouseleave="handleMouseLeave"/>
             <v-line v-if="shape.type === 'poly'" :config="shape" :key="shape.name"
                     @dblclick="openAnnotation($event, shape.name)"
                     @dragend="handleDragEnd($event, shape)" @transformend="handleTransform($event, shape)"
-                    @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave"/>
+                    @mouseenter="handleMouseEnter(shape.name)" @mouseleave="handleMouseLeave"/>
             <v-path v-if="shape.type === 'path'" :config="shape" :key="shape.name"
                     @dblclick="openAnnotation($event, shape.name)"
                     @dragend="handleDragEnd($event, shape)" @transformend="handleTransform($event, shape)"
-                    @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave"/>
+                    @mouseenter="handleMouseEnter(shape.name)" @mouseleave="handleMouseLeave"/>
           </template>
           <v-transformer ref="transformer" v-if="editMode"/>
         </v-layer>
@@ -71,9 +71,10 @@
       <div class="pa-polygon-hint" v-show="isAddingPolygon">{{ $t('polygon_help') }}</div>
     </div>
     <div class="pa-infobar">
-      <div v-for="shape in shapes" :key="shape.name">
-        {{shape.name}}
-      </div>
+      <side-bar-entry v-for="shape in shapes" :key="shape.name" :shape="shape" :edit-mode="editMode"
+                      :selected-shape-name="selectedShapeName" :current-hover-shape="currentHoverShape"
+                      v-on:sidebar-entry-enter="handleSideBarMouseEnter($event)"
+                      v-on:sidebar-entry-leave="handleSideBarMouseLeave($event)"/>
     </div>
   </div>
 </template>
@@ -87,6 +88,7 @@ import Icon from './components/Icon';
 import Annotation from './components/Annotation';
 import AnnotationForm from './components/AnnotationForm';
 import Loader from './components/Loader';
+import SideBarEntry from './components/SideBarEntry';
 
 // some Vue use definitions - Konva painting, i18n
 Vue.use(VueKonva);
@@ -96,6 +98,7 @@ Vue.config.productionTip = false;
 
 export default {
   components: {
+    SideBarEntry,
     Icon,
     Annotation,
     AnnotationForm,
@@ -113,6 +116,7 @@ export default {
       scale: 1, // current scale
       shapes: [], // shape container
       selectedShapeName: '', // currently selected shape
+      currentHoverShape: '', // hovering over certain shape
       showModal: false, // modal is shown?
       isLoading: true, // loading image?
       isShapesVisible: true, // show shapes?
@@ -487,17 +491,41 @@ export default {
     },
 
     // handle show stuff
-    handleMouseEnter () {
-      if (!this.isAddingPolygon) this.$refs.stage.getStage().container().style.cursor = 'pointer';
+    handleMouseEnter (name) {
+      if (!this.isAddingPolygon) {
+        this.$refs.stage.getStage().container().style.cursor = 'pointer';
+        this.currentHoverShape = name;
+      }
     },
     handleMouseLeave () {
-      if (!this.isAddingPolygon) this.$refs.stage.getStage().container().style.cursor = 'default';
+      if (!this.isAddingPolygon) {
+        this.$refs.stage.getStage().container().style.cursor = 'default';
+        this.currentHoverShape = '';
+      }
     },
     handleGlobalMouseEnter () {
       if (this.isAddingPolygon) this.$refs.stage.getStage().container().style.cursor = 'crosshair';
     },
     handleGlobalMouseLeave () {
       if (this.isAddingPolygon) this.$refs.stage.getStage().container().style.cursor = 'default';
+    },
+    handleSideBarMouseEnter (name) {
+      if (!this.isAddingPolygon) {
+        const idx = this.shapes.findIndex(r => r.name === name);
+        if (idx >= 0) {
+          this.shapes[idx].stroke = '#c00';
+          this.shapes[idx].fill = '#dec4b0';
+        }
+      }
+    },
+    handleSideBarMouseLeave (name) {
+      if (!this.isAddingPolygon) {
+        const idx = this.shapes.findIndex(r => r.name === name);
+        if (idx >= 0) {
+          this.shapes[idx].stroke = '#00f';
+          this.shapes[idx].fill = '#b0c4de';
+        }
+      }
     },
 
     // annotation handling
