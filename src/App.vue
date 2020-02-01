@@ -32,19 +32,19 @@
         <v-layer ref="items">
           <template v-for="shape in shapes">
             <v-rect v-if="shape.type === 'rect'" :config="shape" :key="shape.name"
-                    @dblclick="openAnnotation($event, shape.name)" @contextmenu="openContextMenu($event, shape.name)"
+                    @dblclick="openAnnotation($event, shape.name)"
                     @dragend="handleDragEnd($event, shape)" @transformend="handleTransform($event, shape)"
                     @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave"/>
             <v-circle v-if="shape.type === 'circle'" :config="shape" :key="shape.name"
-                      @dblclick="openAnnotation($event, shape.name)" @contextmenu="openContextMenu($event, shape.name)"
+                      @dblclick="openAnnotation($event, shape.name)"
                       @dragend="handleDragEnd($event, shape)" @transformend="handleTransform($event, shape)"
                       @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave"/>
             <v-line v-if="shape.type === 'poly'" :config="shape" :key="shape.name"
-                    @dblclick="openAnnotation($event, shape.name)" @contextmenu="openContextMenu($event, shape.name)"
+                    @dblclick="openAnnotation($event, shape.name)"
                     @dragend="handleDragEnd($event, shape)" @transformend="handleTransform($event, shape)"
                     @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave"/>
             <v-path v-if="shape.type === 'path'" :config="shape" :key="shape.name"
-                    @dblclick="openAnnotation($event, shape.name)" @contextmenu="openContextMenu($event, shape.name)"
+                    @dblclick="openAnnotation($event, shape.name)"
                     @dragend="handleDragEnd($event, shape)" @transformend="handleTransform($event, shape)"
                     @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave"/>
           </template>
@@ -59,13 +59,6 @@
       </v-stage>
 
       <loader v-if="isLoading" />
-
-      <vue-simple-context-menu
-        :elementId="containerId + '-ctx-menu'"
-        :options="[{name: $t('edit'), action: 'edit'}, {name: $t('delete'), action: 'delete'}]"
-        :ref="'vueSimpleContextMenu'"
-        @option-clicked="contextMenuClicked"
-      />
 
       <div class="pa-modal" v-show="showModal">
         <div class="pa-modal-content">
@@ -88,8 +81,6 @@
 <script>
 import Vue from 'vue';
 import VueKonva from 'vue-konva';
-import 'vue-simple-context-menu/dist/vue-simple-context-menu.css';
-import VueSimpleContextMenu from 'vue-simple-context-menu';
 import VueI18n from 'vue-i18n';
 import i18n from './i18n.js';
 import Icon from './components/Icon';
@@ -97,9 +88,8 @@ import Annotation from './components/Annotation';
 import AnnotationForm from './components/AnnotationForm';
 import Loader from './components/Loader';
 
-// some Vue use definitions - Konva painting, context menu component, i18n
+// some Vue use definitions - Konva painting, i18n
 Vue.use(VueKonva);
-Vue.component('vue-simple-context-menu', VueSimpleContextMenu);
 Vue.use(VueI18n);
 
 Vue.config.productionTip = false;
@@ -556,30 +546,6 @@ export default {
       this.$refs.items.getStage().canvas._canvas.style.opacity = this.isShapesVisible ? '0' : '1';
       // TODO: fade animation
       this.isShapesVisible = !this.isShapesVisible;
-    },
-
-    // open context menu handling
-    openContextMenu (eventAll, name) {
-      if (!this.editMode) return; // edit mode only
-
-      if (eventAll.evt) {
-        const event = eventAll.evt;
-        event.preventDefault();
-
-        this.$refs.vueSimpleContextMenu.showMenu(event, name);
-      }
-    },
-    contextMenuClicked (event) {
-      if (event.option && event.option.name) {
-        switch (event.option.action) {
-          case 'edit':
-            this.openAnnotation(null, this.selectedShapeName);
-            break;
-          case 'delete':
-            this.deleteShape(this.selectedShapeName);
-            break;
-        }
-      }
     },
 
     // callback on update
