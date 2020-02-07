@@ -10,9 +10,6 @@
         <a href="#" @click.prevent="addRectangle" :title="$t('add_rectangle')" v-if="editMode"><icon type="add-rectangle" :fill="isAddingPolygon ? 'gray' : 'currentColor'" /></a>
         <a href="#" @click.prevent="addCircle" :title="$t('add_circle')" v-if="editMode"><icon type="add-circle" :fill="isAddingPolygon ? 'gray' : 'currentColor'" /></a>
         <a href="#" @click.prevent="addPerson" :title="$t('add_person')" v-if="editMode"><icon type="add-person" :fill="isAddingPolygon ? 'gray' : 'currentColor'" /></a>
-        <hr v-if="editMode" />
-        <a href="#" @click.prevent="openAnnotation" :title="$t('open_annotation')" v-if="editMode"><icon type="edit-shape" :fill="selectedShapeName ? 'green' : 'gray'" /></a>
-        <a href="#" @click.prevent="deleteShape" :title="$t('delete_shape')" v-if="editMode"><icon type="delete-shape" :fill="selectedShapeName ? 'red' : 'gray'" /></a>
       </div>
       <!-- TODO: Fix buttons above - unselect triggers before button can get selectedShapeName -->
 
@@ -32,19 +29,15 @@
         <v-layer ref="items">
           <template v-for="shape in shapes">
             <v-rect v-if="shape.type === 'rect'" :config="shape" :key="shape.name"
-                    @dblclick="openAnnotation($event, shape.name)"
                     @dragend="handleDragEnd($event, shape)" @transformend="handleTransform($event, shape)"
                     @mouseenter="handleMouseEnter(shape.name)" @mouseleave="handleMouseLeave"/>
             <v-circle v-if="shape.type === 'circle'" :config="shape" :key="shape.name"
-                      @dblclick="openAnnotation($event, shape.name)"
                       @dragend="handleDragEnd($event, shape)" @transformend="handleTransform($event, shape)"
                       @mouseenter="handleMouseEnter(shape.name)" @mouseleave="handleMouseLeave"/>
             <v-line v-if="shape.type === 'poly'" :config="shape" :key="shape.name"
-                    @dblclick="openAnnotation($event, shape.name)"
                     @dragend="handleDragEnd($event, shape)" @transformend="handleTransform($event, shape)"
                     @mouseenter="handleMouseEnter(shape.name)" @mouseleave="handleMouseLeave"/>
             <v-path v-if="shape.type === 'path'" :config="shape" :key="shape.name"
-                    @dblclick="openAnnotation($event, shape.name)"
                     @dragend="handleDragEnd($event, shape)" @transformend="handleTransform($event, shape)"
                     @mouseenter="handleMouseEnter(shape.name)" @mouseleave="handleMouseLeave"/>
           </template>
@@ -60,21 +53,14 @@
 
       <loader v-if="isLoading" />
 
-      <div class="pa-modal" v-show="showModal">
-        <div class="pa-modal-content">
-          <span class="pa-close" @click="showModal = false">&times;</span>
-          <annotation-form :container-id="containerId" v-model="formData" v-on:annotation-finished="formSubmitted()" v-if="editMode"/>
-          <annotation v-else v-model="formData" />
-        </div>
-      </div>
-
       <div class="pa-polygon-hint" v-show="isAddingPolygon">{{ $t('polygon_help') }}</div>
     </div>
     <div class="pa-infobar">
       <side-bar-entry v-for="shape in shapes" :key="shape.name" :shape="shape" :edit-mode="editMode"
                       :selected-shape-name="selectedShapeName" :current-hover-shape="currentHoverShape"
                       v-on:sidebar-entry-enter="handleSideBarMouseEnter($event)"
-                      v-on:sidebar-entry-leave="handleSideBarMouseLeave($event)"/>
+                      v-on:sidebar-entry-leave="handleSideBarMouseLeave($event)"
+                      v-on:sidebar-entry-delete="deleteShape($event)"/>
     </div>
   </div>
 </template>
@@ -85,8 +71,6 @@ import VueKonva from 'vue-konva';
 import VueI18n from 'vue-i18n';
 import i18n from './i18n.js';
 import Icon from './components/Icon';
-import Annotation from './components/Annotation';
-import AnnotationForm from './components/AnnotationForm';
 import Loader from './components/Loader';
 import SideBarEntry from './components/SideBarEntry';
 
@@ -100,8 +84,6 @@ export default {
   components: {
     SideBarEntry,
     Icon,
-    Annotation,
-    AnnotationForm,
     Loader
   },
   props: ['language', 'containerId', 'imageSrc', 'dataCallback', 'localStorageKey', 'width', 'height', 'editMode', 'initialData'],
@@ -117,7 +99,6 @@ export default {
       shapes: [], // shape container
       selectedShapeName: '', // currently selected shape
       currentHoverShape: '', // hovering over certain shape
-      showModal: false, // modal is shown?
       isLoading: true, // loading image?
       isShapesVisible: true, // show shapes?
       isAddingPolygon: false, // currently in polygon add mode?
@@ -233,10 +214,6 @@ export default {
 
       if (this.editMode) {
         this.updateTransformer();
-      } else {
-        // stop propagation - to not propagate to popup event
-        if (e && e.evt) e.evt.stopPropagation();
-        if (name) this.openAnnotation(e, name);
       }
     },
     updateTransformer () {
@@ -264,15 +241,10 @@ export default {
     },
     handleFocusEvent (e) {
       // remove focus if not clicked on element
-      if (this.editMode && !this.showModal && (e.target.nodeName !== 'CANVAS' || e.target !== this.$refs.items.getStage().canvas._canvas)) {
+      if (this.editMode && (e.target.nodeName !== 'CANVAS' || e.target !== this.$refs.items.getStage().canvas._canvas)) {
         // this is not elegant - any nicer way?
         this.selectedShapeName = '';
         this.updateTransformer();
-      }
-
-      // close modal, if clicked outside
-      if (!this.editMode && this.showModal && e && e.target && e.target.classList.contains('pa-modal')) {
-        this.showModal = false;
       }
     },
     cancelEvent (e) {
@@ -442,9 +414,6 @@ export default {
         // delete key pressed?
         if (event.key === 'Delete') this.deleteShape(this.selectedShapeName);
       }
-      if (this.showModal) { // modal shown
-        if (event.key === 'Escape') this.showModal = false;
-      }
     },
 
     // handle scaling of canvas
@@ -528,21 +497,6 @@ export default {
       }
     },
 
-    // annotation handling
-    openAnnotation (event, name) {
-      if (event && event.evt) event.evt.preventDefault();
-      if (!name) name = this.selectedShapeName;
-
-      // find shape
-      const idx = this.shapes.findIndex(r => r.name === name);
-      if (idx >= 0) {
-        // copy data of shape to form in order to edit it (no direct binding!)
-        this.formData = {
-          ...this.shapes[idx].annotation
-        };
-        this.showModal = true;
-      }
-    },
     formSubmitted () {
       // copy back form data to shape data
       const idx = this.shapes.findIndex(r => r.name === this.selectedShapeName);
@@ -564,8 +518,6 @@ export default {
           link: ''
         }
       };
-
-      this.showModal = false;
     },
 
     // toggle shapes shown or not
@@ -634,34 +586,6 @@ export default {
     color: #000
     padding: 0
     margin: 0.1em 0 0.3em 0
-
-.pa-modal
-  position: fixed
-  z-index: 101
-  left: 0
-  top: 0
-  width: 100%
-  height: 100%
-  background-color: rgb(0,0,0)
-  background-color: rgba(0,0,0,0.4)
-
-.pa-modal-content
-  background-color: #fefefe
-  margin: 5% auto
-  padding: 20px
-  border: 1px solid #888
-  width: 500px
-
-.pa-close
-  color: #aaa
-  float: right
-  font-size: 28px
-  font-weight: bold
-
-.pa-close:hover, .pa-close:focus
-  color: black
-  text-decoration: none
-  cursor: pointer
 
 .pa-polygon-hint
   position: absolute
