@@ -60,7 +60,8 @@
                       :selected-shape-name="selectedShapeName" :current-hover-shape="currentHoverShape"
                       v-on:sidebar-entry-enter="handleSideBarMouseEnter($event)"
                       v-on:sidebar-entry-leave="handleSideBarMouseLeave($event)"
-                      v-on:sidebar-entry-delete="deleteShape($event)"/>
+                      v-on:sidebar-entry-delete="deleteShape($event)"
+                      v-on:sidebar-entry-save="formSubmitted($event)"/>
     </div>
   </div>
 </template>
@@ -414,6 +415,10 @@ export default {
         // delete key pressed?
         if (event.key === 'Delete') this.deleteShape(this.selectedShapeName);
       }
+      // TODO only if focued
+      /* if (!this.selectedShapeName) {
+        if (event.key === '+') this.changeScale(0.1);
+      } */
     },
 
     // handle scaling of canvas
@@ -497,27 +502,16 @@ export default {
       }
     },
 
-    formSubmitted () {
-      // copy back form data to shape data
-      const idx = this.shapes.findIndex(r => r.name === this.selectedShapeName);
+    formSubmitted (name) {
+      // save correct color
+      const idx = this.shapes.findIndex(r => r.name === name);
       if (idx >= 0) {
-        this.shapes[idx].annotation = {
-          ...this.formData
-        };
-
-        // callback/persist
-        this.shapesUpdated();
+        this.shapes[idx].stroke = '#00f';
+        this.shapes[idx].fill = '#b0c4de';
       }
 
-      // reset form data
-      this.formData = {
-        ...{
-          title: '',
-          text: '',
-          linkTitle: '',
-          link: ''
-        }
-      };
+      // callback/persist
+      this.shapesUpdated();
     },
 
     // toggle shapes shown or not
