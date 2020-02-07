@@ -1,7 +1,17 @@
 {
   "name": "picture-annotation",
+  "description": "Web based picture annotator - can be used define areas within a picture that contain a title, a description and a link.",
   "version": "0.1.0",
-  "private": true,
+  "license": "MIT",
+  "publishConfig": { "registry": "https://npm.pkg.github.com/" },
+  "homepage": "https://github.com/mkalus/picture-annotation",
+  "bugs": {
+    "url": "https://github.com/mkalus/picture-annotation/issues"
+  },
+  "author": {
+    "name": "Dr. Maximilian Kalus",
+    "url": "https://www.auxnet.de/"
+  },
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
