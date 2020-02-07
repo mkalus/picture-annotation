@@ -14,7 +14,8 @@
 <script>
 import {
   mdiShapePolygonPlus, mdiShapeSquarePlus, mdiShapeCirclePlus, mdiDeleteOutline, mdiSquareEditOutline,
-  mdiMagnifyPlusOutline, mdiMagnifyMinusOutline, mdiEyeOutline, mdiEyeOffOutline
+  mdiMagnifyPlusOutline, mdiMagnifyMinusOutline, mdiEyeOutline, mdiEyeOffOutline, mdiCircleOutline,
+  mdiSquareOutline, mdiAccountOutline
 } from '@mdi/js';
 
 /**
@@ -44,7 +45,7 @@ export default {
     },
     xmlns: {
       type: String,
-      default: 'xmlns="http://www.w3.org/2000/svg"'
+      default: 'http://www.w3.org/2000/svg'
     },
     title: {
       type: String,
@@ -65,6 +66,10 @@ export default {
         case 'add-person': return 'M9 4a4 4 0 014 4 4 4 0 01-4 4 4 4 0 01-4-4 4 4 0 014-4m0 1.9a2.1 2.1 0 100 4.2A2.1 2.1 0 0011.1 8 2.1 2.1 0 009 5.9M20 7v3h3v2h-3v3h-2v-3h-3v-2h3V7h2M9 13c2.67 0 8 1.33 8 4v3H1v-3c0-2.67 5.33-4 8-4m0 1.9c-2.97 0-6.1 1.46-6.1 2.1v1.1h12.2V17c0-.64-3.1-2.1-6.1-2.1z';
         case 'edit-shape': return mdiSquareEditOutline;
         case 'delete-shape': return mdiDeleteOutline;
+        case 'circle': return mdiCircleOutline;
+        case 'rect': return mdiSquareOutline;
+        case 'poly': return 'M15.96 2.4l5.64 4.44v9.96l-10.8 4.8-8.4-8.4L7.2 2.4m1.56 2.4l-3.48 7.92 6 6 7.92-3.48V8.4l-4.8-3.6z';
+        case 'path': return mdiAccountOutline;
         default: return 'NOT FOUND';
       }
     }
