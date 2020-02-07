@@ -57,10 +57,10 @@ export default {
   },
   created () {
     if (this.shape) {
-      this.formData.title = this.shape.title;
-      this.formData.text = this.shape.text;
-      this.formData.linkTitle = this.shape.linkTitle;
-      this.formData.link = this.shape.link;
+      this.formData.title = this.shape.annotation.title;
+      this.formData.text = this.shape.annotation.text;
+      this.formData.linkTitle = this.shape.annotation.linkTitle;
+      this.formData.link = this.shape.annotation.link;
     }
   },
   methods: {
@@ -81,10 +81,10 @@ export default {
     },
     submitted () {
       // copy back data
-      this.shape.title = this.formData.title;
-      this.shape.text = this.formData.text;
-      this.shape.linkTitle = this.formData.linkTitle;
-      this.shape.link = this.formData.link;
+      this.shape.annotation.title = this.formData.title;
+      this.shape.annotation.text = this.formData.text;
+      this.shape.annotation.linkTitle = this.formData.linkTitle;
+      this.shape.annotation.link = this.formData.link;
 
       // close entry
       this.toggleContent();
