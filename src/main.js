@@ -31,7 +31,8 @@ for (let i = 0; i < savedElements.length; i++) {
           width: (this.$el.attributes['data-width'] && this.$el.attributes['data-width'].value) || $el.innerWidth,
           height: (this.$el.attributes['data-height'] && this.$el.attributes['data-height'].value) || $el.innerHeight,
           dataCallback: this.$el.attributes['data-callback'] && this.$el.attributes['data-callback'].value,
-          initialData: (data.length && data[0].innerHTML) || ''
+          initialData: (data.length && data[0].innerHTML) || '',
+          initialDataId: this.$el.attributes['data-initial-data-id'] && this.$el.attributes['data-initial-data-id'].value
         }
       });
     }

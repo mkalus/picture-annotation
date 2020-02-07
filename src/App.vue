@@ -87,7 +87,7 @@ export default {
     Icon,
     Loader
   },
-  props: ['language', 'containerId', 'imageSrc', 'dataCallback', 'localStorageKey', 'width', 'height', 'editMode', 'initialData'],
+  props: ['language', 'containerId', 'imageSrc', 'dataCallback', 'localStorageKey', 'width', 'height', 'editMode', 'initialData', 'initialDataId'],
   i18n: new VueI18n(i18n),
   data () {
     return {
@@ -524,7 +524,10 @@ export default {
       }
     },
     load () {
-      if (this.initialData && this.initialData.length > 0) {
+      if (this.initialDataId) {
+        const node = document.getElementById(this.initialDataId);
+        if (node && node.innerHTML) this.shapes = JSON.parse(node.innerHTML);
+      } else if (this.initialData && this.initialData.length > 0) {
         this.shapes = JSON.parse(this.initialData);
       } else if (this.localStorageKey) {
         const data = localStorage.getItem(this.localStorageKey) || '[]';
