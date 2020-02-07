@@ -586,4 +586,139 @@ export default {
 
 .pa-infobar
   margin-left: 5px
+
+// Loader component
+.pa-loader
+  position: absolute
+  z-index: 102
+  left: 0
+  top: 0
+  width: 100%
+  height: 100%
+  background-color: rgb(0,0,0)
+  background-color: rgba(0,0,0,0.4)
+
+// adapted from https://loading.io/css/
+.lds-ring
+  display: inline-block
+  position: relative
+  width: 100%
+  height: 100%
+
+.lds-ring div
+  box-sizing: border-box
+  display: block
+  top: 30%
+  left: calc(50% - 82px)
+  position: absolute
+  width: 164px
+  height: 164px
+  margin: 8px
+  border: 18px solid #fff
+  border-radius: 50%
+  animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite
+  border-color: #fff transparent transparent transparent
+
+.lds-ring div:nth-child(1)
+  animation-delay: -0.45s
+
+.lds-ring div:nth-child(2)
+  animation-delay: -0.3s
+
+.lds-ring div:nth-child(3)
+  animation-delay: -0.15s
+
+@keyframes lds-ring
+  0%
+    transform: rotate(0deg)
+
+  100%
+    transform: rotate(360deg)
+
+// Side Bar Entry
+.pa-side-bar-entry
+  &.is-hover-target
+    .pa-accordion
+      background-color: #efc4b0
+
+  &.is-selected-target
+    .pa-accordion
+      background-color: #efc4b0
+
+.pa-accordion
+  background-color: #eee
+  color: #444
+  cursor: pointer
+  padding: 18px
+  width: 100%
+  text-align: left
+  border: none
+  outline: none
+  transition: 0.4s
+  margin-bottom: 2px
+
+  &.is-active, &:hover
+    background-color: #ccc
+
+.pa-side-bar-title
+  vertical-align: top
+  padding-left: 5px
+
+.pa-side-bar-icons
+  float: right
+
+.pa-annotation-text
+  padding: 5px
+
+.pa-panel
+  padding: 0 18px
+  background-color: white
+  max-height: 0
+  overflow: hidden
+  transition: max-height 0.2s ease-out
+
+.pa-annotation-link
+  display: block
+  text-align: center
+  color: #000
+  text-decoration: none
+  background: lightgoldenrodyellow
+  padding: 0.7em
+  border: 0
+  margin: 1em 0
+  transition: background 0.5s ease-out
+
+  &:hover, &:focus
+    background: gold
+
+.pa-annotation-form
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif
+  display: grid
+  grid-template-columns: auto 1fr
+  grid-gap: 1em
+  padding: 10px 0
+
+  label
+    grid-column: 1 / 2
+    text-align: right
+
+  button
+    grid-column: 2 / 3
+    background: lightgrey
+    padding: 0.7em
+    border: 0
+
+    &:hover
+      background: gold
+
+  input, textarea
+    grid-column: 2 / 3
+    background: #fff
+    border: 1px solid #9c9c9c
+
+    &:focus
+      outline: 3px solid gold
+
+  textarea
+    height: 10em
 </style>
