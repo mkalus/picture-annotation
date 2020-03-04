@@ -2,7 +2,7 @@
   <div class="pa-side-bar-entry" @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave"
        :class="{'is-selected-target': selectedShapeName === shape.name, 'is-hover-target': currentHoverShape === shape.name}">
 
-    <button @click="toggleContent" class="pa-accordion" :class="{'is-active': active}">
+    <button type="button" @click.prevent.stop="toggleContent" class="pa-accordion" :class="{'is-active': active}">
       <icon :type="shape.type" />
       <span v-if="shape.annotation.title" class="pa-side-bar-title">{{shape.annotation.title}}</span>
       <span v-if="editMode && (active || selectedShapeName === shape.name)" class="pa-side-bar-icons">
@@ -12,7 +12,7 @@
 
     <div class="pa-panel" ref="panel">
       <template v-if="editMode">
-        <form class="pa-annotation-form" @submit.prevent="submitted">
+        <form class="pa-annotation-form" @submit.prevent.stop="submitted">
           <label :for="shape.name + '-title'">{{ $t('annotation_title') }}</label>
           <input type="text" name="title" :id="shape.name + '-title'" v-model="formData.title">
           <label :for="shape.name + '-text'">{{ $t('annotation_text') }}</label>
