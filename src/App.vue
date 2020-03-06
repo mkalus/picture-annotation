@@ -548,6 +548,7 @@ export default {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif
   display: grid
   grid-template-columns: 2fr 1fr
+  overflow: hidden
 
 .pa-canvas
   border: 1px solid #ccc
@@ -586,6 +587,7 @@ export default {
 
 .pa-infobar
   margin-left: 5px
+  overflow-y: scroll
 
 // Loader component
 .pa-loader
