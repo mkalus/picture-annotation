@@ -2,6 +2,8 @@
 
 Web based picture annotator - can be used define areas within a picture that contain a title, a description and a link.
 
+Demo: https://picture-annotation.now.sh/
+
 Screenshot:
 
 ![Screenshot view mode](screen_show.jpg "Screenshot view mode")
